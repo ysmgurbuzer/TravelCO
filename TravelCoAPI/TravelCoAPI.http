@@ -1,0 +1,6 @@
+@TravelCoAPI_HostAddress = http://localhost:5080
+
+GET {{TravelCoAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

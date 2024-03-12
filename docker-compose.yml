@@ -1,0 +1,20 @@
+version: '3.4'
+
+services:
+
+
+  redis:
+   image: redis
+
+
+
+
+  travelcoapi:
+    image: travelcoapi
+    container_name: travelco-container
+    build:
+      context: .
+      dockerfile: TravelCoAPI/Dockerfile
+volumes:
+   redis_volume:
+    
