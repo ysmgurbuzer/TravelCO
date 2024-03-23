@@ -13,6 +13,8 @@ using Persistence.Travel.Repositories;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Application.Travel;
+using Infrastructure.Travel.Tools;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +25,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+//builder.ConfigureHangfireService();
 builder.Services.AddDbContext<TravelContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings:DefaultConnectionString").Value));
 
 builder.Services.AddCors(opt =>
@@ -155,5 +157,5 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 redisService.Connect();
 app.MapControllers();
 app.MapHub<ReservationHub>("/reservationHub");
-
+//app.UseHangfireDashboard();
 app.Run();

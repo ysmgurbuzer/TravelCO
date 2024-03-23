@@ -15,7 +15,7 @@ namespace Domain.Travel.Entities
         public string ResponseTime {  get; set; }
         public HomeownerTitle Title { get; set; }
         public User User { get; set; }
-        public List<Housing> Housing { get; set; }
+        
         public List<OwnerFeatures> OwnerFeatures { get; set; }
 
         public List<OwnerReview> OwnerReviews { get; set; } = new List<OwnerReview>();

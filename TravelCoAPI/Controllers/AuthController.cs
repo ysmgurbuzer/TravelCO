@@ -4,6 +4,7 @@ using Application.Travel.Features.CQRS.Queries.UserQueries;
 using Application.Travel.Services;
 using Application.Travel.Tools;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -28,7 +29,7 @@ namespace TravelCoAPI.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(GetCheckUserQuery query)
+        public async Task<IActionResult> Login([FromBody] GetCheckUserQuery query)
         {
             try
             {
@@ -38,7 +39,9 @@ namespace TravelCoAPI.Controllers
                     if (values.Data.IsExist)
                     {
                         _logger.LogInformation("User logged in successfully.");
-                        return Created("", _jwtTokenGenerator.GenerateToken(values.Data));
+                        var tokenResponse = _jwtTokenGenerator.GenerateToken(values.Data);
+                    
+                        return Ok(new { token = tokenResponse.Token, expiration = tokenResponse.ExpireDate });
                     }
                     else
                     {
@@ -56,6 +59,7 @@ namespace TravelCoAPI.Controllers
         }
 
         [HttpPost("Register")]
+        [Authorize]
         public async Task<IActionResult> Register(CreateUserCommand command)
         {
             try

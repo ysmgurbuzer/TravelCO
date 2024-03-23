@@ -15,7 +15,7 @@ namespace Domain.Travel.Entities
         public  double longitude { get; set; }
         public double latitude { get; set; }
 
-        public Housing Housing { get; set; }
+        //public Housing Housing { get; set; }
     }
     
 }

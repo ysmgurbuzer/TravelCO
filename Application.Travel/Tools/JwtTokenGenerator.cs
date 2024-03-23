@@ -22,8 +22,8 @@ namespace Application.Travel.Tools
         public  TokenResponseDto GenerateToken(GetCheckUserResult result)
         {
             var claims=new List<Claim>();
-            if(!string.IsNullOrWhiteSpace(result.Role))
-            claims.Add(new Claim(ClaimTypes.Role, result.Role));
+            if(result.RoleId!=null)
+            claims.Add(new Claim(ClaimTypes.Role, result.RoleId.ToString()));
            
             claims.Add(new Claim(ClaimTypes.NameIdentifier, result.Id.ToString()));
 

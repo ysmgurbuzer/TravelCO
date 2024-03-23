@@ -53,7 +53,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
             {
                 var userIdClaim = Int32.Parse(_contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
               
-                var surveyResults =  _SurveyRepository.GetList(s => s.UserId == userIdClaim);
+                var surveyResults =  _SurveyRepository.GetByFilter(s => s.UserId == userIdClaim);
 
 
                 var homeLatitude = request.HomeLatitude;
