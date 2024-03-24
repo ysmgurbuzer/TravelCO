@@ -18,3 +18,5 @@ services:
       
     ports:
       - "5080:8080"
+    depends_on:
+      - redis

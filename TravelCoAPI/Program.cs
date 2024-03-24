@@ -30,7 +30,10 @@ builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("RoamlyApiCors", opts =>
     {
-        opts.WithOrigins("http://localhost:5080").AllowAnyHeader().AllowAnyMethod().AllowCredentials(); ;
+        opts.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -44,9 +47,8 @@ opt.AddPolicy("CorsPolicy", builder =>
 }));
 
 builder.Services.AddSignalR();
-
-builder.Services.AddScoped<TravelContext>();
 builder.Services.AddScoped<IUow, Uow>();
+builder.Services.AddScoped<TravelContext>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IRepository<Housing>), sp =>
@@ -148,7 +150,9 @@ var redisService = app.Services.GetRequiredService<RedisService>();
 
     app.UseSwagger();
     app.UseSwaggerUI();
-
+app.UseStaticFiles();
+app.UseCors("RoamlyApiCors");
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ErrorHandlerMiddleware>();
