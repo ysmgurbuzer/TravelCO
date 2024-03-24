@@ -12,6 +12,7 @@ namespace Domain.Travel.Entities
     {
 
         public int Id { get; set; }
+        public string HouseTitle { get; set; }
         public int LocationId {  get; set; }   
         public int OwnerId { get; set; }
         public Category CategoryName { get; set; }
