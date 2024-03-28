@@ -5,9 +5,11 @@ using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace TravelCoAPI.Controllers
 {
@@ -59,6 +61,14 @@ namespace TravelCoAPI.Controllers
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Housing retrieved successfully.");
+                    var city = response.Data.Location.City;
+                    
+                    var airQualityQuery = new GetCurrentAirQualityQuery(city); 
+
+                 
+                    var airQualityResponse = await _mediator.Send(airQualityQuery);
+                    response.Data.AirQuality = airQualityResponse.Data.Data.Aqi;
+                    response.Data.AirDescription = airQualityResponse.Data.Message;
                     return Ok(response.Data);
                 }
                 else

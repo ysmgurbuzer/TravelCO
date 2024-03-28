@@ -25,6 +25,8 @@ namespace Domain.Travel.Entities
         public int BathNumber {  get; set; }    
         public int MaxAccommodates {  get; set; }   
         public decimal Price { get; set; }
+        public int? AirQuality { get; set; }
+        public string? AirDescription { get; set; }
         public List<Reservation> Reservations { get; set; } = new List<Reservation>();
         public List<HousingReview> HousingReviews { get; set; } = new List<HousingReview>();
         public List<HousingFeatures> HousingFeatures { get; set; }

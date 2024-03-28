@@ -13,12 +13,15 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
     public class GetHousingByIdQueryHandler : IRequestHandler<GetHousingByIdQuery, Response<GetHousingByIdQueryResult>>
     {
         private readonly IRepository<Housing> _repository;
+        private readonly IRepository<Location> _locRepository;
         private readonly IMapper _mapper;
+        
 
-        public GetHousingByIdQueryHandler(IRepository<Housing> repository,IMapper mapper)
+        public GetHousingByIdQueryHandler(IRepository<Housing> repository,IMapper mapper, IRepository<Location> locRepository)
         {
             _repository = repository;
             _mapper = mapper;
+            _locRepository = locRepository;
         }
 
         public async Task<Response<GetHousingByIdQueryResult>> Handle(GetHousingByIdQuery request, CancellationToken cancellationToken)
@@ -29,12 +32,24 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
                 if (request.Id != null)
                 {
                     var values = await _repository.GetByIdAsync(request.Id);
+                    
                     if (values != null)
                     {
                         
                         var result= _mapper.Map<GetHousingByIdQueryResult>(values);
+                        var location = await _locRepository.GetByIdAsync(values.LocationId);
 
-                        return Response<GetHousingByIdQueryResult>.Success(result);
+                        if (location != null)
+                        {
+               
+                            result.Location = location;
+                            return Response<GetHousingByIdQueryResult>.Success(result);
+                        }
+                        else
+                        {
+                            return Response<GetHousingByIdQueryResult>.Fail($"Location not found with ID: {values.LocationId}");
+                        }
+                   
                     }
                     else
                     {
