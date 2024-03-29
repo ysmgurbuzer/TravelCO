@@ -59,7 +59,7 @@ namespace TravelCoAPI.Controllers
         }
 
         [HttpPost("Register")]
-        [Authorize]
+      
         public async Task<IActionResult> Register(CreateUserCommand command)
         {
             try
