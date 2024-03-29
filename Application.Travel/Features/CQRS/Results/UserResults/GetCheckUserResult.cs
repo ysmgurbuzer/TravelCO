@@ -11,7 +11,7 @@ namespace Application.Travel.Features.CQRS.Results.UserResults
     {
         public int Id {  get; set; }   
         public string Username { get; set; } 
-        public string Role {  get; set; }   
+        public int RoleId {  get; set; }   
         public bool IsExist {  get; set; }
     }
 }

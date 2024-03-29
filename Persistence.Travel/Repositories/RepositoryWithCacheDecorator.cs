@@ -1,6 +1,8 @@
 ﻿using Application.Travel.Interfaces;
 using Application.Travel.Services;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -32,47 +34,48 @@ namespace Persistence.Travel.Repositories
         }
 
 
+
         public async Task<List<T>> GetListAsync()
         {
-            
             if (!await _cacheRepository.KeyExistsAsync(_key))
                 return await LoadToCacheFromDbAsync();
 
-            var cachedData = await _cacheRepository.StringGetAsync(_key);
+            var cachedData = await _cacheRepository.HashGetAllAsync(_key);
 
-            if (string.IsNullOrEmpty(cachedData))
-                return await LoadToCacheFromDbAsync();
-
-            var dataList = JsonSerializer.Deserialize<List<T>>(cachedData);
-
+            var dataList = new List<T>();
+            foreach (var hashEntry in cachedData)
+            {
+                var jsonString = hashEntry.Value.ToString();
+                var data = JsonSerializer.Deserialize<T>(jsonString);
+                dataList.Add(data);
+            }
             return dataList;
         }
 
 
-        public async Task AddAsync(T entity)
-        {
-            await _repository.AddAsync(entity);
 
-            var serializeObject = JsonSerializer.Serialize(entity);
-            PropertyInfo prop = typeof(T).GetProperty("Id");
-            var entityId = prop.GetValue(entity).ToString();
+        public async Task<T> AddAsync(T entity)
+        {
+
+            var data = await _repository.AddAsync(entity);
 
             if (await _cacheRepository.KeyExistsAsync(_key))
             {
-                await _cacheRepository.KeyDeleteAsync(_key);
+                var serializeObject = JsonSerializer.Serialize(data);
+                PropertyInfo prop = typeof(T).GetProperty("Id");
+                var entityId = prop.GetValue(entity).ToString();
+                await _cacheRepository.HashSetAsync(_key, entityId, serializeObject);
             }
-
-            await _cacheRepository.StringSetAsync(_key, serializeObject);
+            return data;
         }
 
-
-        public async Task<T> FindAsync(object id)
+        public async Task<T> FindAsync(int id)
         {
             var entityId = id.ToString();
 
-            var cachedData = await _cacheRepository.StringGetAsync($"{_key}:{entityId}");
 
-            if (!string.IsNullOrEmpty(cachedData))
+            var cachedData = await _cacheRepository.HashGetAsync(_key, entityId);
+            if (cachedData.HasValue)
             {
                 return JsonSerializer.Deserialize<T>(cachedData);
             }
@@ -81,51 +84,46 @@ namespace Persistence.Travel.Repositories
                 var data = await _repository.FindAsync(id);
                 if (data != null)
                 {
-                    await _cacheRepository.StringSetAsync($"{_key}:{entityId}", JsonSerializer.Serialize(data));
+                    await _cacheRepository.HashSetAsync(_key, entityId, JsonSerializer.Serialize(data));
                 }
                 return data;
             }
         }
 
 
-
-
+     
         public async Task<T> GetByIdAsync(int id)
         {
-            var entityId = id.ToString();
-
             if (await _cacheRepository.KeyExistsAsync(_key))
             {
-                var data = await _cacheRepository.StringGetAsync($"{_key}:{entityId}");
-                return !string.IsNullOrEmpty(data) ? JsonSerializer.Deserialize<T>(data) : default;
+                var data = await _cacheRepository.HashGetAsync(_key, RedisValue.Unbox(id));
+                return data.HasValue ? JsonSerializer.Deserialize<T>(data) : null;
+
             }
 
             var dbData = await LoadToCacheFromDbAsync();
             PropertyInfo prop = typeof(T).GetProperty("Id");
-            var datas = dbData.FirstOrDefault(x => prop.GetValue(x).ToString() == entityId);
-            return datas;
-
+            return dbData.FirstOrDefault(x => prop.GetValue(x).ToString() == id.ToString());
         }
 
-
-        public T GetList(Expression<Func<T, bool>> filter)
+        public List<T> GetList(Expression<Func<T, bool>> filter)
         {
             var cacheKey = $"{_key}:{filter}";
 
-            var cachedData =  _cacheRepository.StringGetAsync($"{_key}:{cacheKey}");
-            if (cachedData!=null)
+            var cachedData =  _cacheRepository.HashGet(_key, cacheKey);
+            if (cachedData.HasValue)
             {
-                var resultString = cachedData.ToString();
-                return JsonSerializer.Deserialize<T>(resultString);
+                var cachedResult = JsonSerializer.Deserialize<List<T>>(cachedData);
+
+                return cachedResult;
             }
             else
             {
-                var result = _repository.GetList(filter);
-                 _cacheRepository.StringSetAsync($"{_key}:{cacheKey}", JsonSerializer.Serialize(result));
+                var result =  _repository.GetList(filter);
+                 _cacheRepository.HashSet(_key, cacheKey, JsonSerializer.Serialize(result));
                 return result;
             }
         }
-
 
 
         public IQueryable<T> GetQuery()
@@ -133,57 +131,65 @@ namespace Persistence.Travel.Repositories
             return _repository.GetQuery();
         }
 
-        public async void Delete(T entity)
+        public async Task Delete(T entity)
         {
             PropertyInfo prop = typeof(T).GetProperty("Id");
             var entityId = prop.GetValue(entity).ToString();
 
-            var existsInCache = await _cacheRepository.KeyExistsAsync($"{_key}:{entityId}");
+            var existsInCache = await _cacheRepository.HashExistsAsync(_key, entityId);
+
 
             if (existsInCache)
             {
-               await  _cacheRepository.KeyDeleteAsync($"{_key}:{entityId}");
-                _repository.Delete(entity);
+                await _cacheRepository.HashDeleteAsync(_key, entityId);
+                 _repository.Delete(entity);
             }
             else
             {
-                _repository.Delete(entity);
+
+                 _repository.Delete(entity);
             }
         }
 
-        public void Update(T t, T unchanged)
+        public async Task Update(T t, T unchanged)
         {
-            _repository.Update(t, unchanged);
+             _repository.Update(t, unchanged);
 
             var serializeObject = JsonSerializer.Serialize(t);
             PropertyInfo prop = typeof(T).GetProperty("Id");
             var entityId = prop.GetValue(t).ToString();
-             _cacheRepository.StringSetAsync($"{_key}:{entityId}", serializeObject);
+            await _cacheRepository.HashSetAsync(_key, entityId, serializeObject);
         }
-
 
 
         private async Task<List<T>> LoadToCacheFromDbAsync()
         {
             var data = await _repository.GetListAsync();
-            var tasks = new List<Task>();
-
-            foreach (var item in data)
+            data.ForEach(x =>
             {
                 PropertyInfo prop = typeof(T).GetProperty("Id");
-                var idValue = prop.GetValue(item);
-
-                var jsonString = JsonSerializer.Serialize(item);
-                tasks.Add(_cacheRepository.StringSetAsync($"{_key}:{idValue}", jsonString));
-            }
-
-            await Task.WhenAll(tasks);
+                var idValue = prop.GetValue(x);
+                _cacheRepository.HashSetAsync(_key, idValue.ToString(), JsonSerializer.Serialize(x));
+            });
 
             return data;
         }
 
-        
+        public T GetByFilter(Expression<Func<T, bool>> filter = null)
+        {
+            var cacheKey = $"{_key}:{filter}";
 
-
+            var cachedData = _cacheRepository.HashGet(_key, cacheKey);
+            if (cachedData.HasValue)
+            {
+                return JsonSerializer.Deserialize<T>(cachedData);
+            }
+            else
+            {
+                var result = _repository.GetByFilter(filter);
+                _cacheRepository.HashSet(_key, cacheKey, JsonSerializer.Serialize(result));
+                return result;
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Travel.Context;
 
@@ -11,13 +12,15 @@ using Persistence.Travel.Context;
 namespace Persistence.Travel.Migrations
 {
     [DbContext(typeof(TravelContext))]
-    partial class TravelContextModelSnapshot : ModelSnapshot
+    [Migration("20240321204509_forOwnerHouseFK")]
+    partial class forOwnerHouseFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -74,12 +77,6 @@ namespace Persistence.Travel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AirDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("AirQuality")
-                        .HasColumnType("int");
-
                     b.Property<int>("BathNumber")
                         .HasColumnType("int");
 
@@ -90,10 +87,6 @@ namespace Persistence.Travel.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("FloorLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HouseTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -124,8 +117,6 @@ namespace Persistence.Travel.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LocationId");
-
-                    b.HasIndex("OwnerId");
 
                     b.ToTable("Housings");
                 });
@@ -550,15 +541,7 @@ namespace Persistence.Travel.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Travel.Entities.Owner", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Location");
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Domain.Travel.Entities.HousingDescriptions", b =>

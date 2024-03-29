@@ -11,14 +11,16 @@ namespace Application.Travel.Interfaces
     public interface IRepository<T>where T : class
     {
 
-        T GetList(Expression<Func<T, bool>> filter = null);
-        void Delete(T t);
+        T GetByFilter(Expression<Func<T, bool>> filter = null);
+        Task Delete(T t);
         Task<T> GetByIdAsync(int id);
         Task<List<T>> GetListAsync();
-        Task AddAsync(T t);
-        void Update(T t, T unchanged);
+        Task<T> AddAsync(T t);
+        Task Update(T t, T unchanged);
 
-        Task<T> FindAsync(object id);
+        Task<T> FindAsync(int id);
         IQueryable<T> GetQuery();
+
+        List<T> GetList(Expression<Func<T, bool>> filter = null);
     }
 }

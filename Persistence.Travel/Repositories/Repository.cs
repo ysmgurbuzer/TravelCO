@@ -18,7 +18,19 @@ namespace Persistence.Travel.Repositories
             _travelContext = travelContext;
 
         }
-        public T GetList(Expression<Func<T, bool>> filter = null)
+        public List<T> GetList(Expression<Func<T, bool>> filter = null)
+        {
+            if (filter != null)
+            {
+                return _travelContext.Set<T>().Where(filter).ToList();
+            }
+            else
+            {
+                return _travelContext.Set<T>().ToList();
+            }
+        }
+
+        public T GetByFilter(Expression<Func<T, bool>> filter = null)
         {
             if (filter != null)
             {
@@ -29,7 +41,7 @@ namespace Persistence.Travel.Repositories
                 return _travelContext.Set<T>().FirstOrDefault();
             }
         }
-        public void Delete(T t)
+        public async Task Delete(T t)
         {
             _travelContext.Set<T>().Remove(t);
 
@@ -45,20 +57,21 @@ namespace Persistence.Travel.Repositories
         {
             return await _travelContext.Set<T>().AsNoTracking().ToListAsync();
         }
-        public async Task<T> FindAsync(object id)
+        public async Task<T> FindAsync(int id)
         {
             return await _travelContext.Set<T>().FindAsync(id);
 
         }
-        public async Task AddAsync(T t)
+        public async Task<T> AddAsync(T t)
         {
-            await _travelContext.Set<T>().AddAsync(t);
-       
+           await _travelContext.Set<T>().AddAsync(t);
+            return t;
+
         }
 
-        public void Update(T t, T unchanged)
+        public async Task Update(T t, T unchanged)
         {
-            _travelContext.Entry(unchanged).CurrentValues.SetValues(t);
+           _travelContext.Entry(unchanged).CurrentValues.SetValues(t);
    
 
         }

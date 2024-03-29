@@ -34,6 +34,8 @@ namespace TravelCoAPI.Controllers
             _logger = logger;
         }
 
+        //getbyıd kullanarak ownerın evine yapılan rezervasyonları görüntüle
+
         [HttpGet]
         public async Task<IActionResult> ListUsersReservations()
         {

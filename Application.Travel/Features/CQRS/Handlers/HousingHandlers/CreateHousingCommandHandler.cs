@@ -25,12 +25,13 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
         public CreateHousingCommandHandler(IRepository<Housing> repository, 
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IRepository<User> userRepository, IUow uow)
+            IRepository<User> userRepository,
+            IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
-            _UserRepository = userRepository;
+            _UserRepository = userRepository;   
             _uow = uow;
         }
 
@@ -38,7 +39,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
         {
             try
             {
-                var userIdClaim = Int32.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var userIdClaim = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 if (userIdClaim==null)
                 {
                     return Response<Housing>.Fail("User information not found.");
@@ -49,6 +50,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
                 newHousing.CategoryName = ((CategoryTypes.Category)request.CategoryId);
 
                 await _repository.AddAsync(newHousing);
+
                 await UpdateUserRole();
                 await _uow.SaveChangeAsync();
 
@@ -65,7 +67,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
         }
         private async Task UpdateUserRole()
         {
-            var userIdClaim = Int32.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userIdClaim = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var userRoleClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
 
             if (userIdClaim!=null && !string.IsNullOrEmpty(userRoleClaim))
@@ -73,8 +75,8 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
                
                 var user = await _UserRepository.GetByIdAsync(userIdClaim);
 
-                
-                if (userRoleClaim == "User")
+                var a = (int)RoleTypes.User;
+                if (int.Parse(userRoleClaim) == a)
                 {
                     
                     user.RoleId = (int)RoleTypes.Owner;

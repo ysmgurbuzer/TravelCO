@@ -13,6 +13,8 @@ using Persistence.Travel.Repositories;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Application.Travel;
+using Infrastructure.Travel.Tools;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -159,5 +161,5 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 redisService.Connect();
 app.MapControllers();
 app.MapHub<ReservationHub>("/reservationHub");
-
+//app.UseHangfireDashboard();
 app.Run();
