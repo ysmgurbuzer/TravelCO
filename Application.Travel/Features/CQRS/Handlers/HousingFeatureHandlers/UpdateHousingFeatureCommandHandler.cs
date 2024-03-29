@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.HousingFeatureCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
@@ -22,16 +23,19 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
         private readonly IMapper _mapper;
         private readonly IRepository<Housing> _housingRepository;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IUow _uow;
 
         public UpdateHousingFeatureCommandHandler(IRepository<HousingFeatures> repository, 
             IMapper mapper,
             IRepository<Housing> housingRepository,
-            IHttpContextAccessor contextAccessor)
+            IHttpContextAccessor contextAccessor,
+            IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _housingRepository = housingRepository;
             _contextAccessor = contextAccessor;
+            _uow = uow;
         }
 
         public async Task<Response<HousingFeatures>> Handle(UpdateHousingFeatureCommand request, CancellationToken cancellationToken)
@@ -57,8 +61,8 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
                             var updatedHousing = _mapper.Map(request.Command, unchangedHousing);
                             updatedHousing.Id = unchangedHousing.Id;
                              _repository.Update(updatedHousing, unchangedHousing);
-
-                            return Response<HousingFeatures>.Success("Housing feature update transaction is success");
+                              await _uow.SaveChangeAsync();
+                        return Response<HousingFeatures>.Success("Housing feature update transaction is success");
                        
                     }
 

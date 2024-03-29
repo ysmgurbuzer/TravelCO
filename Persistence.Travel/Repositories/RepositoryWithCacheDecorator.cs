@@ -34,18 +34,15 @@ namespace Persistence.Travel.Repositories
 
         public async Task<List<T>> GetListAsync()
         {
-            // Cache'de anahtar mevcut değilse, verileri veritabanından yükleyin ve önbelleğe ekleyin
+            
             if (!await _cacheRepository.KeyExistsAsync(_key))
                 return await LoadToCacheFromDbAsync();
 
-            // Cache'den verileri getir
             var cachedData = await _cacheRepository.StringGetAsync(_key);
 
-            // Eğer cache'te veri yoksa veya boşsa, yeniden veritabanından yükleyin
             if (string.IsNullOrEmpty(cachedData))
                 return await LoadToCacheFromDbAsync();
 
-            // Cache'ten alınan JSON verisini nesneye dönüştürün
             var dataList = JsonSerializer.Deserialize<List<T>>(cachedData);
 
             return dataList;
@@ -56,18 +53,15 @@ namespace Persistence.Travel.Repositories
         {
             await _repository.AddAsync(entity);
 
-            // Veriyi önbelleğe alırken string olarak kaydedin
             var serializeObject = JsonSerializer.Serialize(entity);
             PropertyInfo prop = typeof(T).GetProperty("Id");
             var entityId = prop.GetValue(entity).ToString();
 
-            // Anahtar önceden varsa, önce silin
             if (await _cacheRepository.KeyExistsAsync(_key))
             {
                 await _cacheRepository.KeyDeleteAsync(_key);
             }
 
-            // Veriyi önbelleğe alın
             await _cacheRepository.StringSetAsync(_key, serializeObject);
         }
 
@@ -76,21 +70,17 @@ namespace Persistence.Travel.Repositories
         {
             var entityId = id.ToString();
 
-            // Önbellekten veriyi alma
             var cachedData = await _cacheRepository.StringGetAsync($"{_key}:{entityId}");
 
             if (!string.IsNullOrEmpty(cachedData))
             {
-                // Önbellekten alınan JSON verisini nesneye dönüştür
                 return JsonSerializer.Deserialize<T>(cachedData);
             }
             else
             {
-                // Veri önbellekte yoksa, veritabanından al
                 var data = await _repository.FindAsync(id);
                 if (data != null)
                 {
-                    // Veriyi önbelleğe al
                     await _cacheRepository.StringSetAsync($"{_key}:{entityId}", JsonSerializer.Serialize(data));
                 }
                 return data;
@@ -183,12 +173,10 @@ namespace Persistence.Travel.Repositories
                 PropertyInfo prop = typeof(T).GetProperty("Id");
                 var idValue = prop.GetValue(item);
 
-                // Veriyi önbelleğe alırken string olarak kaydedin
                 var jsonString = JsonSerializer.Serialize(item);
                 tasks.Add(_cacheRepository.StringSetAsync($"{_key}:{idValue}", jsonString));
             }
 
-            // Tüm önbelleğe alma işlemlerini eşzamanlı olarak bekleyin
             await Task.WhenAll(tasks);
 
             return data;

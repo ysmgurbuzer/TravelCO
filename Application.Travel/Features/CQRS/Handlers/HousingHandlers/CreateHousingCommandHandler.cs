@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.RoleCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Domain.Travel.Enums;
@@ -20,15 +21,17 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRepository<User> _UserRepository;
+        private readonly IUow _uow;
         public CreateHousingCommandHandler(IRepository<Housing> repository, 
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IRepository<User> userRepository)
+            IRepository<User> userRepository, IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
-            _UserRepository = userRepository;   
+            _UserRepository = userRepository;
+            _uow = uow;
         }
 
         public async Task<Response<Housing>> Handle(CreateHousingCommand request, CancellationToken cancellationToken)
@@ -36,7 +39,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
             try
             {
                 var userIdClaim = Int32.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                if (userIdClaim!=null)
+                if (userIdClaim==null)
                 {
                     return Response<Housing>.Fail("User information not found.");
                 }
@@ -47,6 +50,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
 
                 await _repository.AddAsync(newHousing);
                 await UpdateUserRole();
+                await _uow.SaveChangeAsync();
 
                 return Response<Housing>.Success(newHousing);
             }
@@ -73,11 +77,12 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
                 if (userRoleClaim == "User")
                 {
                     
-                    user.RoleId = Int32.Parse(RoleTypes.Owner.ToString());
+                    user.RoleId = (int)RoleTypes.Owner;
                 }
 
                
                  _UserRepository.Update(user,user);
+
             }
         }
     }
