@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Handlers.HousingHandlers;
 using Application.Travel.Features.CQRS.Queries.HousingQueries;
+using Application.Travel.Features.CQRS.Results.HousingResults;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -85,7 +86,7 @@ namespace TravelCoAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+      
         public async Task<IActionResult> CreateHousing(CreateHousingCommand command)
         {
             try
@@ -111,6 +112,7 @@ namespace TravelCoAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> RemoveHousing(int id)
         {
             try
@@ -136,7 +138,7 @@ namespace TravelCoAPI.Controllers
         }
 
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> UpdateHousing(UpdateHousingCommand command)
         {
             try
@@ -160,5 +162,35 @@ namespace TravelCoAPI.Controllers
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
+  
+
+        [HttpGet("GetListByOwner")]
+        [Authorize(Roles = "2")]//kontrol et sayıyla çalışıyor 
+        public async Task<IActionResult> GetListByOwner()
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetHousingByOwnerQuery());
+
+                if (response.Succeeded)
+                {
+                    _logger.LogInformation("Housing list retrieved successfully.");
+                    return Ok(response.Data);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to retrieve housing list: {Message}", response.Message);
+                    return BadRequest(response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving housing list.");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+
+        }
+
     }
 }

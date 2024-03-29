@@ -33,7 +33,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingDescriptionHandlers
                 var housingIdObjectId = query.HousingId;
                 if (housingIdObjectId != null)
                 {
-                    var values =  _repository.GetList(x => x.HousingId == housingIdObjectId);
+                    var values =  _repository.GetByFilter(x => x.HousingId == housingIdObjectId);
                     if (values!=null) 
                     {
                         var result =_mapper.Map<GetDescriptionByIdQueryResult>(values);

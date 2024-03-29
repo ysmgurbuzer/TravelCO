@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Travel.Context;
 
@@ -11,9 +12,11 @@ using Persistence.Travel.Context;
 namespace Persistence.Travel.Migrations
 {
     [DbContext(typeof(TravelContext))]
-    partial class TravelContextModelSnapshot : ModelSnapshot
+    [Migration("20240321204509_forOwnerHouseFK")]
+    partial class forOwnerHouseFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,13 +77,6 @@ namespace Persistence.Travel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AirDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AirQuality")
-                        .HasColumnType("int");
-
                     b.Property<int>("BathNumber")
                         .HasColumnType("int");
 
@@ -91,10 +87,6 @@ namespace Persistence.Travel.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("FloorLocation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HouseTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

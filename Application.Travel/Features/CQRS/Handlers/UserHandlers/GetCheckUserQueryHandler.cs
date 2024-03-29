@@ -34,12 +34,12 @@ namespace Application.Travel.Features.CQRS.Handlers.UserHandlers
             try
             {
                 var values = new GetCheckUserResult();
-                var user =  _UserRepository.GetList(x => x.UserName == request.Username);
+                var user =  _UserRepository.GetByFilter(x => x.UserName == request.Username);
 
                 if (user != null && BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
                 {
                     values.IsExist = true;
-                    var roleType = user.RoleId;
+                    values.RoleId  = user.RoleId;
                    
                     values = _mapper.Map(user, values);
 

@@ -29,6 +29,8 @@ namespace Application.Travel.Profiles
             CreateMap<DescriptionCommand, HousingDescriptions>().ReverseMap();
             CreateMap<HousingDescriptions, GetDescriptionByIdQueryResult>().ReverseMap();
             CreateMap<GetDescriptionQueryResult, HousingDescriptions>().ReverseMap();
+          
+            CreateMap<GetHousingByOwnerResult, Housing>().ReverseMap();
         }
     }
 }
