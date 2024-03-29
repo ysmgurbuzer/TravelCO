@@ -16,5 +16,7 @@ namespace Application.Travel.Dtos
 
         public string Token { get; set; }   
         public DateTime ExpireDate { get; set; }
+
+
     }
 }
