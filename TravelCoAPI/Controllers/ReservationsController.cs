@@ -9,6 +9,7 @@ using Application.Travel.Features.CQRS.Queries.ReservationQueries;
 using Application.Travel.Interfaces;
 using Domain.Travel.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -17,6 +18,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TravelCoAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationsController : ControllerBase
