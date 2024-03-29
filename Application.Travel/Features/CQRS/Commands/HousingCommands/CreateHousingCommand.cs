@@ -26,7 +26,7 @@ namespace Application.Travel.Features.CQRS.Commands.HousingCommands
         public int BathNumber { get; set; }
         public int MaxAccommodates { get; set; }
         public decimal Price { get; set; }
-        [JsonIgnore]
+    
         public Location Location { get; set; }
 
     }
