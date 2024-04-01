@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.ReservationCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Domain.Travel.Enums;
@@ -22,15 +23,18 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRepository<Housing> _HousingRepository;
+        private readonly IUow _uow;
         public CreateReservationCommandHandler(IRepository<Reservation> repository,
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IRepository<Housing> housingRepository)
+            IRepository<Housing> housingRepository,
+            IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _HousingRepository = housingRepository;
+            _uow = uow; 
         }
 
         public async Task<Response<Reservation>> Handle(CreateReservationCommand request, CancellationToken cancellationToken)
@@ -51,11 +55,11 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
                     mappedRequest.Status = ReservationStatus.Confirmed.ToString();
                     mappedRequest.HousingId=request.HousingId;
                     mappedRequest.TotalPrice = CalculateTotalAmount(mappedRequest.CheckOutDate, mappedRequest.CheckInDate, mappedRequest.NumberOfAdults, house);
-
+                   
                     house.Reservations.Add(mappedRequest);
-
+                    
                     await _repository.AddAsync(mappedRequest);
-
+                    await _uow.SaveChangeAsync();
                    
                     return Response<Reservation>.Success(mappedRequest);
                 }

@@ -9,6 +9,7 @@ namespace Application.Travel.Features.CQRS.Results.HousingResults
     public class GetHousingByOwnerResult
     {
         public int Id { get; set; }
+        public string HouseTitle { get; set; }
         public int LocationId { get; set; }
         public int OwnerId { get; set; }
         public int CategoryId { get; set; }

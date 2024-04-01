@@ -1,4 +1,5 @@
 ﻿using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Travel.Context;
 using System;
@@ -13,10 +14,11 @@ namespace Persistence.Travel.Repositories
     public class Repository<T> : IRepository<T> where T : class
     {
         private readonly TravelContext _travelContext;
+      
         public Repository(TravelContext travelContext)
         {
             _travelContext = travelContext;
-
+         
         }
         public List<T> GetList(Expression<Func<T, bool>> filter = null)
         {
@@ -57,6 +59,8 @@ namespace Persistence.Travel.Repositories
         {
             return await _travelContext.Set<T>().AsNoTracking().ToListAsync();
         }
+
+     
         public async Task<T> FindAsync(int id)
         {
             return await _travelContext.Set<T>().FindAsync(id);
@@ -65,6 +69,7 @@ namespace Persistence.Travel.Repositories
         public async Task<T> AddAsync(T t)
         {
            await _travelContext.Set<T>().AddAsync(t);
+          
             return t;
 
         }

@@ -20,7 +20,7 @@ namespace Application.Travel.Interfaces
 
         Task<T> FindAsync(int id);
         IQueryable<T> GetQuery();
-
+     
         List<T> GetList(Expression<Func<T, bool>> filter = null);
     }
 }

@@ -49,8 +49,8 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
                 newHousing.OwnerId = userIdClaim;
                 newHousing.CategoryName = ((CategoryTypes.Category)request.CategoryId);
 
-                await _repository.AddAsync(newHousing);
-
+              var data=  await _repository.AddAsync(newHousing);
+                data.Id = 0;
                 await UpdateUserRole();
                 await _uow.SaveChangeAsync();
 

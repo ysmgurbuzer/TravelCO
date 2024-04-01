@@ -51,7 +51,8 @@ opt.AddPolicy("CorsPolicy", builder =>
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IUow, Uow>();
 builder.Services.AddScoped<TravelContext>();
-
+builder.Services.AddScoped<MongoContext>();
+builder.Services.AddScoped<AIRecommendationServiceBuilder, AIRecommendationService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IRepository<Housing>), sp =>
 {
