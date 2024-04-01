@@ -20,6 +20,7 @@ namespace Application.Travel
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof
                 (DependencyExtension).Assembly));
           
+            
 
         }
 

@@ -1,5 +1,6 @@
 ﻿using Application.Travel.Interfaces;
 using Application.Travel.Services;
+using Domain.Travel.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
@@ -22,6 +23,8 @@ namespace Persistence.Travel.Repositories
         private readonly IRepository<T> _repository;
         private readonly string _key;
         private readonly StackExchange.Redis.IDatabase _cacheRepository;
+      
+
 
         //decorative design pattern
         public RepositoryWithCacheDecorator(RedisService redisService,
@@ -31,6 +34,7 @@ namespace Persistence.Travel.Repositories
             _repository = repository;
             _key = $"{typeof(T).Name}Caches";
             _cacheRepository = _redisService.GetDb(0);
+           
         }
 
 
@@ -53,21 +57,37 @@ namespace Persistence.Travel.Repositories
         }
 
 
-
+        //eklerken dbye ekle sadece redise doğrudan ekleme yapma
         public async Task<T> AddAsync(T entity)
         {
 
             var data = await _repository.AddAsync(entity);
 
+           
+
             if (await _cacheRepository.KeyExistsAsync(_key))
             {
-                var serializeObject = JsonSerializer.Serialize(data);
                 PropertyInfo prop = typeof(T).GetProperty("Id");
-                var entityId = prop.GetValue(entity).ToString();
-                await _cacheRepository.HashSetAsync(_key, entityId, serializeObject);
+                var entityId = (int)prop.GetValue(data);
+                int maxId = await GetMaxIdFromCacheAsync();
+                prop.SetValue(entity, maxId + 1);
+
+                var serializeObject = JsonSerializer.Serialize(entity);
+                await _cacheRepository.HashSetAsync(_key, (maxId + 1).ToString(), serializeObject);
+               
             }
             return data;
         }
+       
+
+        private async Task<int> GetMaxIdFromCacheAsync()
+        {
+            
+            var cacheData = await _cacheRepository.HashGetAllAsync(_key);
+            int maxId = cacheData.Select(item => int.Parse(item.Key)).Max();
+            return maxId;
+        }
+
 
         public async Task<T> FindAsync(int id)
         {
@@ -174,7 +194,7 @@ namespace Persistence.Travel.Repositories
 
             return data;
         }
-
+      
         public T GetByFilter(Expression<Func<T, bool>> filter = null)
         {
             var cacheKey = $"{_key}:{filter}";
@@ -191,5 +211,7 @@ namespace Persistence.Travel.Repositories
                 return result;
             }
         }
+
+    
     }
 }
