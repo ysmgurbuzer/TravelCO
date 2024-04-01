@@ -55,12 +55,12 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
                     mappedRequest.Status = ReservationStatus.Confirmed.ToString();
                     mappedRequest.HousingId=request.HousingId;
                     mappedRequest.TotalPrice = CalculateTotalAmount(mappedRequest.CheckOutDate, mappedRequest.CheckInDate, mappedRequest.NumberOfAdults, house);
-
+                   
                     house.Reservations.Add(mappedRequest);
-
+                    
                     await _repository.AddAsync(mappedRequest);
                     await _uow.SaveChangeAsync();
-
+                   
                     return Response<Reservation>.Success(mappedRequest);
                 }
                 else

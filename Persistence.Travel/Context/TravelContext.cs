@@ -30,6 +30,7 @@ namespace Persistence.Travel.Context
         }
 
         public DbSet<Favorites> Favorites { get; set; }
+        public DbSet<AIRecommendation> AI { get; set; }
         public DbSet<Housing> Housings { get; set; }
         public DbSet<HousingDescriptions> HousingDescriptions { get; set; }
         public DbSet<HousingFeatures> HousingFeatures { get; set; }

@@ -19,6 +19,7 @@ namespace Application.Travel.Features.CQRS.Commands.HousingCommands
     public class HousingCommand
     {
         public int LocationId { get; set; }
+        public string HouseTitle { get; set; }
         public int CategoryId { get; set; }
         public int OwnerId { get; set; }
         public string? ImagePathOne { get; set; }
