@@ -10,7 +10,7 @@ namespace Application.Travel.Features.CQRS.Results.HousingResults
     {
         public int Id { get; set; }
         public string HouseTitle { get; set; }
-        public int LocationId { get; set; }
+        public string LocationName { get; set; }
         public int OwnerId { get; set; }
         public int CategoryId { get; set; }
         public string? ImagePathOne { get; set; }

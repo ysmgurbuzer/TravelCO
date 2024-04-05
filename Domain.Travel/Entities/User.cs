@@ -29,7 +29,7 @@ namespace Domain.Travel.Entities
         public Gender Gender { get; set; }
         public List<UserRoles> UserRoles { get; set; }
         public List<Favorites> Favorites { get; set; }
-        public List<UserRoles> userRoles { get; set; }
+    
 
     }
 }

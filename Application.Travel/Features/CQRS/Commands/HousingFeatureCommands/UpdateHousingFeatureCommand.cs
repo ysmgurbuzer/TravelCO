@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Domain.Travel.Enums.HomeServiceTypesClass;
 
 namespace Application.Travel.Features.CQRS.Commands.HousingFeatureCommands
 {
@@ -20,7 +21,7 @@ namespace Application.Travel.Features.CQRS.Commands.HousingFeatureCommands
     public class FeatureCommand
     {
         public int HousingId { get; set; }
-        public HomeServiceTypes ServiceId { get; set; }
+        public HomeServiceTypes Name { get; set; }
         public bool Available { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.HousingFeatureCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
@@ -15,10 +16,12 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
     public class RemoveHousingFeatureCommandHandler : IRequestHandler<RemoveHousingFeatureCommand, Response<HousingFeatures>>
     {
         private readonly IRepository<HousingFeatures> _repository;
+        private readonly IUow _uow;
 
-        public RemoveHousingFeatureCommandHandler(IRepository<HousingFeatures> repository)
+        public RemoveHousingFeatureCommandHandler(IRepository<HousingFeatures> repository,IUow uow)
         {
             _repository = repository;
+            _uow = uow;
         }
         //şimdilik remove işlemini pas geçtik 2.02.2024
         public async Task<Response<HousingFeatures>> Handle(RemoveHousingFeatureCommand request, CancellationToken cancellationToken)
@@ -29,9 +32,20 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
                 if (request.Id != null)
                 {
                     var value = await _repository.GetByIdAsync(request.Id);
-                     _repository.Delete(value);
+                    if (value.Available==true) 
+                    {
+                        value.Available = false;
+                        await _uow.SaveChangeAsync();
 
-                    return Response<HousingFeatures>.Success("Housing delete transaction is success");
+                        return Response<HousingFeatures>.Success("Housing delete transaction is success");
+                    }
+                    else
+                    {
+                        return Response<HousingFeatures>.Fail("Already House Feature is not available");
+                    }
+                     
+
+                   
                 }
                 else
                 {

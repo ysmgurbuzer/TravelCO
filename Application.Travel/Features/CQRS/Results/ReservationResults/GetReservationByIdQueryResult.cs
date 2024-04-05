@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Domain.Travel.Enums.ReservationStatus;
 
 namespace Application.Travel.Features.CQRS.Results.ReservationResults
 {
@@ -17,6 +18,6 @@ namespace Application.Travel.Features.CQRS.Results.ReservationResults
         public int NumberOfAdults { get; set; }
         public int NumberOfChildren { get; set; }
         public decimal TotalPrice { get; set; }
-        public ReservationStatus Status { get; set; }
+        public string Status { get; set; }
     }
 }

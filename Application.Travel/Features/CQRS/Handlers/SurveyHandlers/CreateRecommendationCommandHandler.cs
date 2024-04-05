@@ -120,6 +120,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         private List<List<object>> GetPlacesMatchingHomeLocation(double homeLatitude, double homeLongitude)
         {
             var placesList = PlaceStorage.GetPlacesList();
+            
             var matchingPlaces = new List<List<object>>();
             foreach (var place in placesList)
             {

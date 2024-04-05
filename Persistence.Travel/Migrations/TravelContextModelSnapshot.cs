@@ -71,17 +71,12 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("HousingId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("HousingId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HousingId");
-
-                    b.HasIndex("HousingId1");
 
                     b.HasIndex("UserId");
 
@@ -230,9 +225,6 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("HousingId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("HousingId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -242,8 +234,6 @@ namespace Persistence.Travel.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("HousingId");
-
-                    b.HasIndex("HousingId1");
 
                     b.HasIndex("UserId");
 
@@ -344,25 +334,20 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("HomeownerId")
                         .HasColumnType("int");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId2")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("HomeownerId");
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("OwnerReviews");
                 });
@@ -415,9 +400,6 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("HousingId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("HousingId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("NumberOfAdults")
                         .HasColumnType("int");
 
@@ -437,8 +419,6 @@ namespace Persistence.Travel.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("HousingId");
-
-                    b.HasIndex("HousingId1");
 
                     b.HasIndex("UserId");
 
@@ -572,22 +552,14 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RolesId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RolesId");
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("UserRoles");
                 });
@@ -618,16 +590,16 @@ namespace Persistence.Travel.Migrations
             modelBuilder.Entity("Domain.Travel.Entities.Favorites", b =>
                 {
                     b.HasOne("Domain.Travel.Entities.Housing", "FavoriteHousings")
-                        .WithMany()
-                        .HasForeignKey("HousingId");
-
-                    b.HasOne("Domain.Travel.Entities.Housing", null)
                         .WithMany("Favorites")
-                        .HasForeignKey("HousingId1");
+                        .HasForeignKey("HousingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "Users")
                         .WithMany("Favorites")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("FavoriteHousings");
 
@@ -678,16 +650,16 @@ namespace Persistence.Travel.Migrations
             modelBuilder.Entity("Domain.Travel.Entities.HousingReview", b =>
                 {
                     b.HasOne("Domain.Travel.Entities.Housing", "Housing")
-                        .WithMany()
-                        .HasForeignKey("HousingId");
-
-                    b.HasOne("Domain.Travel.Entities.Housing", null)
                         .WithMany("HousingReviews")
-                        .HasForeignKey("HousingId1");
+                        .HasForeignKey("HousingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "User")
                         .WithMany("HousingReviews")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Housing");
 
@@ -720,18 +692,15 @@ namespace Persistence.Travel.Migrations
                 {
                     b.HasOne("Domain.Travel.Entities.Owner", "Owner")
                         .WithMany("OwnerReviews")
-                        .HasForeignKey("HomeownerId")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .IsRequired();
-
-                    b.HasOne("Domain.Travel.Entities.User", null)
                         .WithMany("OwnerReviews")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Owner");
 
@@ -748,16 +717,16 @@ namespace Persistence.Travel.Migrations
             modelBuilder.Entity("Domain.Travel.Entities.Reservation", b =>
                 {
                     b.HasOne("Domain.Travel.Entities.Housing", "Housing")
-                        .WithMany()
-                        .HasForeignKey("HousingId");
-
-                    b.HasOne("Domain.Travel.Entities.Housing", null)
                         .WithMany("Reservations")
-                        .HasForeignKey("HousingId1");
+                        .HasForeignKey("HousingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "User")
                         .WithMany("Reservations")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Housing");
 
@@ -777,9 +746,9 @@ namespace Persistence.Travel.Migrations
 
             modelBuilder.Entity("Domain.Travel.Entities.UserRoles", b =>
                 {
-                    b.HasOne("Domain.Travel.Entities.Roles", "Roles")
+                    b.HasOne("Domain.Travel.Entities.Roles", "Role")
                         .WithMany("userRoles")
-                        .HasForeignKey("RolesId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -789,11 +758,7 @@ namespace Persistence.Travel.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Travel.Entities.User", null)
-                        .WithMany("userRoles")
-                        .HasForeignKey("UserId1");
-
-                    b.Navigation("Roles");
+                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
@@ -840,8 +805,6 @@ namespace Persistence.Travel.Migrations
                     b.Navigation("Reservations");
 
                     b.Navigation("UserRoles");
-
-                    b.Navigation("userRoles");
                 });
 #pragma warning restore 612, 618
         }

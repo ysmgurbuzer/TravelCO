@@ -12,9 +12,12 @@ namespace Domain.Travel.Entities
     {
 
         public int Id { get; set; }
-        [ForeignKey("User")]
+
+        [ForeignKey("Users")]
         public int UserId { get; set; }
-        [ForeignKey("Housing")]
+
+
+        [ForeignKey("Housings")]
         public int HousingId { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }

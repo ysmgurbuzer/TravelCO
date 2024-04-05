@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.HousingDescriptionCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
@@ -20,14 +21,15 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingDescriptionHandlers
         private readonly IRepository<HousingDescriptions> _repository;
         private readonly IMapper _mapper;
         private readonly IRepository<Housing> _housingRepository;
-        private readonly IHttpContextAccessor _contextAccessor; 
-
-        public UpdateDescriptionCommandHandler(IRepository<HousingDescriptions> repository, IMapper mapper, IRepository<Housing> housingRepository, IHttpContextAccessor contextAccessor)
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IUow _uow;
+        public UpdateDescriptionCommandHandler(IRepository<HousingDescriptions> repository, IMapper mapper, IRepository<Housing> housingRepository, IHttpContextAccessor contextAccessor,IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _housingRepository = housingRepository;
             _contextAccessor = contextAccessor; 
+            _uow = uow;
         }
 
         public async Task<Response<HousingDescriptions>> Handle(UpdateDescriptionCommand request, CancellationToken cancellationToken)
@@ -58,6 +60,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingDescriptionHandlers
                             var updatedHousing = _mapper.Map(request.Command, unchangedHousing);
                             updatedHousing.Id = unchangedHousing.Id;
                              _repository.Update(updatedHousing, unchangedHousing);
+                          await  _uow.SaveChangeAsync();
 
                             return Response<HousingDescriptions>.Success("Housing description update transaction is success");
                         }

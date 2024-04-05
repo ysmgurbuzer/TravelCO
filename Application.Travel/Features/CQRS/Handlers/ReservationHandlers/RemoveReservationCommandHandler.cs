@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.ReservationCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using Domain.Travel.Entities;
 using Domain.Travel.Enums;
 using Infrastructure.Travel.CustomErrorHandler;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Domain.Travel.Enums.ReservationStatus;
 
 namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
 {
@@ -20,12 +22,14 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
         private readonly IRepository<Reservation> _repository;
         private readonly IRepository<Housing> _Housingrepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUow _uow;
 
-        public RemoveReservationCommandHandler(IRepository<Reservation> repository, IHttpContextAccessor httpContextAccessor, IRepository<Housing> housingrepository)
+        public RemoveReservationCommandHandler(IRepository<Reservation> repository, IHttpContextAccessor httpContextAccessor, IRepository<Housing> housingrepository,IUow uow)
         {
             _repository = repository;
             _httpContextAccessor = httpContextAccessor;
             _Housingrepository = housingrepository; 
+            _uow = uow;
         }
 
         public async Task<Response<Reservation>> Handle(RemoveReservationCommand request, CancellationToken cancellationToken)
@@ -57,10 +61,12 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
                     return Response<Reservation>.Fail("Cannot cancel reservation. Minimum cancellation period is 7 days.");
                 }
 
-                reservation.Status = ReservationStatus.Cancelled.ToString();
+                reservation.Status=ReservationStatus.Confirmed.ToString();
+                Console.WriteLine(reservation.Status);
                 house.Reservations.Remove(reservation);
                  _repository.Delete(reservation);
                 //PARA İADESİ İŞLEMİ YAPILACAK
+                await _uow.SaveChangeAsync();
 
                 return Response<Reservation>.Success("Housing removed successfully.");
             }

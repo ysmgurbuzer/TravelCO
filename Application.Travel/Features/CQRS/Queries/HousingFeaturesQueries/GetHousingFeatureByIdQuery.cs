@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Application.Travel.Features.CQRS.Queries.HousingFeaturesQueries
 {
-    public class GetHousingFeatureByIdQuery : IRequest<Response<GetHousingFeatureByIdQueryResult>>
+    public class GetHousingFeatureByIdQuery : IRequest<Response<List<GetHousingFeatureByIdQueryResult>>>
     {
-        public int Id { get; set; }
+        public int HousingId { get; set; }
         public GetHousingFeatureByIdQuery(int id)
         {
-            Id = id;
+            HousingId = id;
         }
     }
 }

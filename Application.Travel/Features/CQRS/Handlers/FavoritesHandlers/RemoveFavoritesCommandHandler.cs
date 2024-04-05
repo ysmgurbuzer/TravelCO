@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.FavoritesCommands;
 using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
@@ -18,10 +19,12 @@ namespace Application.Travel.Features.CQRS.Handlers.FavoritesHandlers
     {
         private readonly IRepository<Favorites> _repository;
         private readonly IHttpContextAccessor _contextAccessor;
-        public RemoveFavoritesCommandHandler(IRepository<Favorites> repository, IHttpContextAccessor contextAccessor)
+        private readonly IUow _uow;
+        public RemoveFavoritesCommandHandler(IRepository<Favorites> repository, IHttpContextAccessor contextAccessor,IUow uow)
         {
             _repository = repository;
             _contextAccessor = contextAccessor;
+            _uow = uow;
         }
 
 
@@ -41,6 +44,7 @@ namespace Application.Travel.Features.CQRS.Handlers.FavoritesHandlers
                         return Response<Favorites>.Fail($"Record not found");
                     }
                      _repository.Delete(value);
+                  await _uow.SaveChangeAsync();
                     
                   
 

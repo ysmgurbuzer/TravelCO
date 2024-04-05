@@ -63,19 +63,7 @@ namespace Persistence.Travel.Repositories
 
             var data = await _repository.AddAsync(entity);
 
-           
-
-            if (await _cacheRepository.KeyExistsAsync(_key))
-            {
-                PropertyInfo prop = typeof(T).GetProperty("Id");
-                var entityId = (int)prop.GetValue(data);
-                int maxId = await GetMaxIdFromCacheAsync();
-                prop.SetValue(entity, maxId + 1);
-
-                var serializeObject = JsonSerializer.Serialize(entity);
-                await _cacheRepository.HashSetAsync(_key, (maxId + 1).ToString(), serializeObject);
-               
-            }
+          
             return data;
         }
        

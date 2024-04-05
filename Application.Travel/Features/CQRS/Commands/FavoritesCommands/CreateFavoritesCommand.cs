@@ -11,7 +11,7 @@ namespace Application.Travel.Features.CQRS.Commands.FavoritesCommands
 {
     public class CreateFavoritesCommand : IRequest<Response<Favorites>>
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public int UserId { get; set; }
 
         public int HousingId { get; set; }

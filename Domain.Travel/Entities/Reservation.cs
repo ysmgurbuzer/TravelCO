@@ -13,10 +13,10 @@ namespace Domain.Travel.Entities
     
         public int Id { get; set; }
 
-        [ForeignKey("User")]
+        [ForeignKey("Users")]
         public int UserId { get; set; }
 
-        [ForeignKey("Housing")]
+        [ForeignKey("Housings")]
         public int HousingId { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }

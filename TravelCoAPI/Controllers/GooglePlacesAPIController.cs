@@ -126,6 +126,11 @@ namespace TravelCoAPI.Controllers
                             {
                                 PlaceStorage.AddPlace(home.latitude,home.longitude,place.Location.Latitude, place.Location.Longitude, place.Types, place.Rating);
                             }
+                            var placesList = PlaceStorage.GetPlacesList();
+
+                            var a = placesList.Count;
+                           
+
                             int idCount = places.Places.Count;
 
                             var jsonResponseObj = new
