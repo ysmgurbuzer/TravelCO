@@ -17,20 +17,32 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
     {
         private readonly IRepository<Housing> _repository;
         private readonly IMapper _mapper;
-
-        public GetHousingQueryHandler(IRepository<Housing> repository,IMapper mapper)
+        private readonly IRepository<Location> _repositoryLoc;
+        public GetHousingQueryHandler(IRepository<Housing> repository,IMapper mapper, IRepository<Location> repositoryLoc)
         {
             _repository = repository;
             _mapper = mapper;
+            _repositoryLoc = repositoryLoc; 
         }
 
         public async Task<Response<List<GetHousingQueryResult>>> Handle(GetHousingQuery request, CancellationToken cancellationToken)
         {
+
             try
             {
                 var values = await _repository.GetListAsync();
-                
-                var result = _mapper.Map<List<GetHousingQueryResult>>(values);
+                var results = new List<GetHousingQueryResult>();
+                foreach (var value in values)
+                {
+                    var Location = await _repositoryLoc.GetByIdAsync(value.LocationId);
+                    var result1 = _mapper.Map<GetHousingQueryResult>(value);
+                    if (Location != null)
+                        result1.LocationCity = Location.City;
+                    result1.LocationCountry = Location.Country;
+
+                    results.Add(result1);
+                }
+                var result = _mapper.Map<List<GetHousingQueryResult>>(results);
 
                 return Response<List<GetHousingQueryResult>>.Success(result);
             }

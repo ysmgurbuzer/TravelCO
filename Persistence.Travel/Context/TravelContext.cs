@@ -30,6 +30,7 @@ namespace Persistence.Travel.Context
         }
 
         public DbSet<Favorites> Favorites { get; set; }
+        public DbSet<AIRecommendation> AI { get; set; }
         public DbSet<Housing> Housings { get; set; }
         public DbSet<HousingDescriptions> HousingDescriptions { get; set; }
         public DbSet<HousingFeatures> HousingFeatures { get; set; }
@@ -49,61 +50,8 @@ namespace Persistence.Travel.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.UserRoles)
-                .WithOne(ur => ur.User)
-                .HasForeignKey(ur => ur.UserId);
+           
 
-            modelBuilder.Entity<User>()
-       .HasMany(u => u.OwnerReviews)
-       .WithOne()
-       .HasForeignKey(o => o.UserId)
-       .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<OwnerReview>()
-       .HasOne(o => o.User)
-       .WithMany()
-       .HasForeignKey(o => o.UserId)
-       .OnDelete(DeleteBehavior.ClientSetNull);
-
-
-            modelBuilder.Entity<Favorites>()
-      .HasOne(f => f.Users)
-      .WithMany(u => u.Favorites)
-      .HasForeignKey(f => f.UserId)
-      .IsRequired(false);
-
-            modelBuilder.Entity<Favorites>()
-                .HasOne(f => f.FavoriteHousings)
-                .WithMany()
-                .HasForeignKey(f => f.HousingId)
-                .IsRequired(false);
-
-
-            modelBuilder.Entity<HousingReview>()
-.HasOne(f => f.User)
-.WithMany(u => u.HousingReviews)
-.HasForeignKey(f => f.UserId)
-.IsRequired(false);
-
-            modelBuilder.Entity<HousingReview>()
-                .HasOne(f => f.Housing)
-                .WithMany()
-                .HasForeignKey(f => f.HousingId)
-                .IsRequired(false);
-
-
-            modelBuilder.Entity<Reservation>()
-.HasOne(f => f.User)
-.WithMany(u => u.Reservations)
-.HasForeignKey(f => f.UserId)
-.IsRequired(false);
-
-            modelBuilder.Entity<Reservation>()
-                .HasOne(f => f.Housing)
-                .WithMany()
-                .HasForeignKey(f => f.HousingId)
-                .IsRequired(false);
         }
     }
 }

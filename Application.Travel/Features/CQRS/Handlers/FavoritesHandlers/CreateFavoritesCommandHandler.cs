@@ -1,5 +1,6 @@
 ﻿using Application.Travel.Features.CQRS.Commands.FavoritesCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
@@ -19,11 +20,13 @@ namespace Application.Travel.Features.CQRS.Handlers.FavoritesHandlers
         private readonly IRepository<Favorites> _repository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _contextAccessor;
-        public CreateFavoritesCommandHandler(IRepository<Favorites> repository, IMapper mapper, IHttpContextAccessor contextAccessor)
+        private readonly IUow _uow;
+        public CreateFavoritesCommandHandler(IRepository<Favorites> repository, IMapper mapper, IHttpContextAccessor contextAccessor,IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _contextAccessor = contextAccessor;
+            _uow = uow;
         }
         public async Task<Response<Favorites>> Handle(CreateFavoritesCommand command, CancellationToken cancellationToken)
         {
@@ -33,13 +36,13 @@ namespace Application.Travel.Features.CQRS.Handlers.FavoritesHandlers
                 var HousingId = command.HousingId;
                 var values = new Favorites
                 {
-                    Id = command.Id,
+                   
                     UserId =userIdClaim,
                    HousingId = HousingId,
                 };
 
                 await _repository.AddAsync(values);
-
+                await _uow.SaveChangeAsync();
                 return Response<Favorites>.Success(values);
             }
             catch (ValidateException ex)

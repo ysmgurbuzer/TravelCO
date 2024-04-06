@@ -11,27 +11,24 @@ namespace Application.Travel.Features.CQRS.Commands.SurveyCommands
 {
     public class CreateRecommendationCommand : IRequest<Response<AIRecommendation>>
     {
-        public int UserId { get; set; }
+        public int Id { get; set; }
 
-        public List<object> PreferredCategories { get; set; }
+        public int UserId { get; set; }
+        public List<string> PreferredCategories { get; set; }
         public double HomeLatitude { get; set; }
         public double HomeLongitude { get; set; }
 
-        public double Place1Latitude { get; set; }
-        public double Place1Longitude { get; set; }
-        public object Place1Type { get; set; }
+        public List<Place> Places { get; set; }
 
-        public double Place2Latitude { get; set; }
-        public double Place2Longitude { get; set; }
-        public object Place2Type { get; set; }
-
-        public double Place3Latitude { get; set; }
-        public double Place3Longitude { get; set; }
-        public object Place3Type { get; set; }
-
-        public double Place1Score { get; set; }
-        public double Place2Score { get; set; }
-        public double Place3Score { get; set; }
 
     }
+    public class Place
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public List<string> Types { get; set; }
+        public double Score { get; set; }
+    }
+
 }
+

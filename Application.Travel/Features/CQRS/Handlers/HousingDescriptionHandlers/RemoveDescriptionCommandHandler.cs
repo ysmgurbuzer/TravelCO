@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.HousingDescriptionCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
@@ -19,11 +20,13 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingDescriptionHandlers
         private readonly IRepository<HousingDescriptions> _repository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRepository<Housing> _HousingRepository;
-        public RemoveDescriptionCommandHandler(IRepository<HousingDescriptions> repository, IHttpContextAccessor httpContextAccessor, IRepository<Housing> HousingRepository)
+        private readonly IUow _uow;
+        public RemoveDescriptionCommandHandler(IRepository<HousingDescriptions> repository, IHttpContextAccessor httpContextAccessor, IRepository<Housing> HousingRepository,IUow uow)
         {
             _repository = repository;
             _httpContextAccessor = httpContextAccessor;
             _HousingRepository = HousingRepository;
+            _uow = uow;
         }
 
         public async Task<Response<HousingDescriptions>> Handle(RemoveDescriptionCommand request, CancellationToken cancellationToken)
@@ -43,6 +46,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingDescriptionHandlers
                         var RemoveId = await _repository.GetListAsync();
                         var matchingDescription = RemoveId.FirstOrDefault(x => x.HousingId == objectId);
                          _repository.Delete(matchingDescription);
+                        await _uow.SaveChangeAsync();
 
                         return Response<HousingDescriptions>.Success("Housing description delete transaction is success");
                     }

@@ -1,8 +1,10 @@
 ﻿
+using Domain.Travel.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Application.Travel.Features.CQRS.Results.HousingResults
@@ -10,6 +12,7 @@ namespace Application.Travel.Features.CQRS.Results.HousingResults
     public class GetHousingByIdQueryResult
     {
         public int Id { get; set; }
+        public string HouseTitle { get; set; }
         public int LocationId { get; set; }
         public int OwnerId { get; set; }
         public int CategoryId { get; set; }
@@ -22,5 +25,10 @@ namespace Application.Travel.Features.CQRS.Results.HousingResults
         public int BathNumber { get; set; }
         public int MaxAccommodates { get; set; }
         public decimal Price { get; set; }
+        public int? AirQuality { get; set; }
+        public string? AirDescription { get; set; }
+
+        [JsonIgnore]
+        public Location Location { get; set; }
     }
 }

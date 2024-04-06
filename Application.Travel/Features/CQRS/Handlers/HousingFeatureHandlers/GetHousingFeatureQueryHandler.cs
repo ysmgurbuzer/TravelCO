@@ -5,6 +5,7 @@ using Application.Travel.Features.CQRS.Results.UserResults;
 using Application.Travel.Interfaces;
 using AutoMapper;
 using Domain.Travel.Entities;
+using Domain.Travel.Enums;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
 using System;
@@ -31,8 +32,9 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
             try
             {
                 var values = await _repository.GetListAsync();
-
+                
                 var result = _mapper.Map<List<GetHousingFeaturesQueryResult>>(values);
+             
 
                 return Response<List<GetHousingFeaturesQueryResult>>.Success(result);
             }

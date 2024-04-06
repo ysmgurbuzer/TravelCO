@@ -12,18 +12,56 @@ using Persistence.Travel.Context;
 namespace Persistence.Travel.Migrations
 {
     [DbContext(typeof(TravelContext))]
-    [Migration("20240311192258_Azuredb")]
-    partial class Azuredb
+    [Migration("20240401182204_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Travel.Entities.AIRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("HomeLatitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("HomeLongitude")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PreferredCategories")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SurveyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("SurveyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AI");
+                });
 
             modelBuilder.Entity("Domain.Travel.Entities.Favorites", b =>
                 {
@@ -36,17 +74,12 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("HousingId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("HousingId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HousingId");
-
-                    b.HasIndex("HousingId1");
 
                     b.HasIndex("UserId");
 
@@ -77,6 +110,12 @@ namespace Persistence.Travel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AirDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("AirQuality")
+                        .HasColumnType("int");
+
                     b.Property<int>("BathNumber")
                         .HasColumnType("int");
 
@@ -87,6 +126,10 @@ namespace Persistence.Travel.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("FloorLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HouseTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -116,8 +159,7 @@ namespace Persistence.Travel.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LocationId")
-                        .IsUnique();
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("OwnerId");
 
@@ -186,9 +228,6 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("HousingId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("HousingId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -198,8 +237,6 @@ namespace Persistence.Travel.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("HousingId");
-
-                    b.HasIndex("HousingId1");
 
                     b.HasIndex("UserId");
 
@@ -300,27 +337,53 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("HomeownerId")
                         .HasColumnType("int");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId1")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId2")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("HomeownerId");
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId1");
-
                     b.ToTable("OwnerReviews");
+                });
+
+            modelBuilder.Entity("Domain.Travel.Entities.Place", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AIRecommendationId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Score")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Types")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AIRecommendationId");
+
+                    b.ToTable("Place");
                 });
 
             modelBuilder.Entity("Domain.Travel.Entities.Reservation", b =>
@@ -338,9 +401,6 @@ namespace Persistence.Travel.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("HousingId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("HousingId1")
                         .HasColumnType("int");
 
                     b.Property<int>("NumberOfAdults")
@@ -362,8 +422,6 @@ namespace Persistence.Travel.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("HousingId");
-
-                    b.HasIndex("HousingId1");
 
                     b.HasIndex("UserId");
 
@@ -497,39 +555,54 @@ namespace Persistence.Travel.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RolesId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RolesId");
+                    b.HasIndex("RoleId");
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId1");
-
                     b.ToTable("UserRoles");
+                });
+
+            modelBuilder.Entity("Domain.Travel.Entities.AIRecommendation", b =>
+                {
+                    b.HasOne("Domain.Travel.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
+
+                    b.HasOne("Domain.Travel.Entities.Survey", "Survey")
+                        .WithMany()
+                        .HasForeignKey("SurveyId");
+
+                    b.HasOne("Domain.Travel.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("Survey");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Travel.Entities.Favorites", b =>
                 {
                     b.HasOne("Domain.Travel.Entities.Housing", "FavoriteHousings")
-                        .WithMany()
-                        .HasForeignKey("HousingId");
-
-                    b.HasOne("Domain.Travel.Entities.Housing", null)
                         .WithMany("Favorites")
-                        .HasForeignKey("HousingId1");
+                        .HasForeignKey("HousingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "Users")
                         .WithMany("Favorites")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("FavoriteHousings");
 
@@ -539,13 +612,13 @@ namespace Persistence.Travel.Migrations
             modelBuilder.Entity("Domain.Travel.Entities.Housing", b =>
                 {
                     b.HasOne("Domain.Travel.Entities.Location", "Location")
-                        .WithOne("Housing")
-                        .HasForeignKey("Domain.Travel.Entities.Housing", "LocationId")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.Owner", "Owner")
-                        .WithMany("Housing")
+                        .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -580,16 +653,16 @@ namespace Persistence.Travel.Migrations
             modelBuilder.Entity("Domain.Travel.Entities.HousingReview", b =>
                 {
                     b.HasOne("Domain.Travel.Entities.Housing", "Housing")
-                        .WithMany()
-                        .HasForeignKey("HousingId");
-
-                    b.HasOne("Domain.Travel.Entities.Housing", null)
                         .WithMany("HousingReviews")
-                        .HasForeignKey("HousingId1");
+                        .HasForeignKey("HousingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "User")
                         .WithMany("HousingReviews")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Housing");
 
@@ -622,37 +695,41 @@ namespace Persistence.Travel.Migrations
                 {
                     b.HasOne("Domain.Travel.Entities.Owner", "Owner")
                         .WithMany("OwnerReviews")
-                        .HasForeignKey("HomeownerId")
+                        .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .IsRequired();
-
-                    b.HasOne("Domain.Travel.Entities.User", null)
                         .WithMany("OwnerReviews")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Owner");
 
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Travel.Entities.Place", b =>
+                {
+                    b.HasOne("Domain.Travel.Entities.AIRecommendation", null)
+                        .WithMany("Places")
+                        .HasForeignKey("AIRecommendationId");
+                });
+
             modelBuilder.Entity("Domain.Travel.Entities.Reservation", b =>
                 {
                     b.HasOne("Domain.Travel.Entities.Housing", "Housing")
-                        .WithMany()
-                        .HasForeignKey("HousingId");
-
-                    b.HasOne("Domain.Travel.Entities.Housing", null)
                         .WithMany("Reservations")
-                        .HasForeignKey("HousingId1");
+                        .HasForeignKey("HousingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Travel.Entities.User", "User")
                         .WithMany("Reservations")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Housing");
 
@@ -672,9 +749,9 @@ namespace Persistence.Travel.Migrations
 
             modelBuilder.Entity("Domain.Travel.Entities.UserRoles", b =>
                 {
-                    b.HasOne("Domain.Travel.Entities.Roles", "Roles")
+                    b.HasOne("Domain.Travel.Entities.Roles", "Role")
                         .WithMany("userRoles")
-                        .HasForeignKey("RolesId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -684,13 +761,14 @@ namespace Persistence.Travel.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Travel.Entities.User", null)
-                        .WithMany("userRoles")
-                        .HasForeignKey("UserId1");
-
-                    b.Navigation("Roles");
+                    b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Travel.Entities.AIRecommendation", b =>
+                {
+                    b.Navigation("Places");
                 });
 
             modelBuilder.Entity("Domain.Travel.Entities.Housing", b =>
@@ -707,16 +785,8 @@ namespace Persistence.Travel.Migrations
                     b.Navigation("Reservations");
                 });
 
-            modelBuilder.Entity("Domain.Travel.Entities.Location", b =>
-                {
-                    b.Navigation("Housing")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Domain.Travel.Entities.Owner", b =>
                 {
-                    b.Navigation("Housing");
-
                     b.Navigation("OwnerFeatures");
 
                     b.Navigation("OwnerReviews");
@@ -738,8 +808,6 @@ namespace Persistence.Travel.Migrations
                     b.Navigation("Reservations");
 
                     b.Navigation("UserRoles");
-
-                    b.Navigation("userRoles");
                 });
 #pragma warning restore 612, 618
         }

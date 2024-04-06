@@ -18,6 +18,7 @@ namespace Application.Travel._Helpers
                 new HousingProfile(),
                 new FavoritesProfile(),
                 new ReservationProfile(),
+                new CategoryProfile(),
 
             };
 

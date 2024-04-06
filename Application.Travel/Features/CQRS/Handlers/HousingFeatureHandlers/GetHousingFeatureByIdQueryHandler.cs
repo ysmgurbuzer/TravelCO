@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
 {
-    public class GetHousingFeatureByIdQueryHandler : IRequestHandler<GetHousingFeatureByIdQuery, Response<GetHousingFeatureByIdQueryResult>>
+    public class GetHousingFeatureByIdQueryHandler : IRequestHandler<GetHousingFeatureByIdQuery, Response<List<GetHousingFeatureByIdQueryResult>>>
     {
         private readonly IRepository<HousingFeatures> _repository;
         private readonly IMapper _mapper;
@@ -27,35 +27,39 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
             _mapper = mapper;
         }
 
-        public async Task<Response<GetHousingFeatureByIdQueryResult>> Handle(GetHousingFeatureByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Response<List<GetHousingFeatureByIdQueryResult>>> Handle(GetHousingFeatureByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var objectId = request.Id;
+                var objectId = request.HousingId;
                 if (objectId != null)
                 {
-                    var values = await _repository.GetByIdAsync(objectId);
+                    var values = _repository.GetList(x => x.HousingId == objectId);
                     if (values != null)
                     {
 
-                        var result = _mapper.Map<GetHousingFeatureByIdQueryResult>(values);
+                        var result = _mapper.Map<List<GetHousingFeatureByIdQueryResult>>(values);
 
-                        return Response<GetHousingFeatureByIdQueryResult>.Success(result);
+                        return Response<List<GetHousingFeatureByIdQueryResult>>.Success(result);
                     }
                     else
                     {
-                        return Response<GetHousingFeatureByIdQueryResult>.Fail($"Housing feature not found with ID: {request.Id}");
+                        return Response<List<GetHousingFeatureByIdQueryResult>>.Fail($"Housing feature not found with ID: {request.HousingId}");
                     }
                 }
                 else
                 {
-                    return Response<GetHousingFeatureByIdQueryResult>.Fail($"Invalid ID format: {request.Id}");
+                    return Response<List<GetHousingFeatureByIdQueryResult>>.Fail($"Invalid ID format: {request.HousingId}");
                 }
             }
             catch (Exception ex)
             {
-                return Response<GetHousingFeatureByIdQueryResult>.Fail($"Internal Server Error: {ex.Message}");
+                return Response<List<GetHousingFeatureByIdQueryResult>>.Fail($"Internal Server Error: {ex.Message}");
             }
         }
+
+
+
+            
     }
 }

@@ -1,8 +1,10 @@
 ﻿ using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.HousingFeatureCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
+using Domain.Travel.Enums;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -21,16 +23,19 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRepository<Housing> _HousingRepository;
+        private readonly IUow _uow;
 
         public CreateHousingFeatureCommandHandler(IRepository<HousingFeatures> repository, 
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IRepository<Housing> housingRepository)
+            IRepository<Housing> housingRepository,
+            IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _HousingRepository = housingRepository; 
+            _uow = uow;
         }
 
         public async Task<Response<HousingFeatures>> Handle(CreateHousingFeatureCommand request, CancellationToken cancellationToken)
@@ -41,13 +46,14 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
                 var owners = await _HousingRepository.GetListAsync();
                 var OwnerValues = owners.Where(x => x.OwnerId.ToString() == userIdClaim).ToList();
 
+              
                 var newHousing = _mapper.Map<HousingFeatures>(request);
+            
 
-               
                 if (OwnerValues.Any(owner => owner.Id == newHousing.HousingId))
                 {
                     await _repository.AddAsync(newHousing);
-
+                    await _uow.SaveChangeAsync();
                     return Response<HousingFeatures>.Success(newHousing);
                 }
                 else

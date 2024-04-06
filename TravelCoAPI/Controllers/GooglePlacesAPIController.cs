@@ -92,13 +92,13 @@ namespace TravelCoAPI.Controllers
 
                 var data = new
                 {
-                    maxResultCount = 10,
+                    maxResultCount = 20,
                     locationRestriction = new
                     {
                         circle = new
                         {
                             center = new { home.latitude, home.longitude },
-                            radius = 500.0
+                            radius = 1000
                         }
                     },
                     includedTypes
@@ -121,14 +121,27 @@ namespace TravelCoAPI.Controllers
                         if (!string.IsNullOrEmpty(contentType))
                         {
                             var places = JsonConvert.DeserializeObject<GooglePlacesResponseModel>(jsonResponse);
-
+                          
                             foreach (var place in places.Places)
                             {
                                 PlaceStorage.AddPlace(home.latitude,home.longitude,place.Location.Latitude, place.Location.Longitude, place.Types, place.Rating);
                             }
+                            var placesList = PlaceStorage.GetPlacesList();
+
+                            var a = placesList.Count;
                            
 
-                            return Content(jsonResponse, contentType);
+                            int idCount = places.Places.Count;
+
+                            var jsonResponseObj = new
+                            {
+                                places = places,
+                                idCount = idCount                     };
+
+                            var jsonResponsee = JsonConvert.SerializeObject(jsonResponseObj);
+
+                            return Content(jsonResponsee, "application/json");
+
                         }
 
                         return Ok(jsonResponse);

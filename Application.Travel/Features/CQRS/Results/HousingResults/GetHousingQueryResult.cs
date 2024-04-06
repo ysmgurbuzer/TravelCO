@@ -11,7 +11,9 @@ namespace Application.Travel.Features.CQRS.Results.UserResults
     {
 
         public int Id { get; set; }
-        public int LocationId { get; set; }
+        public string HouseTitle { get; set; }
+        public string LocationCity { get; set; }
+        public string LocationCountry { get; set; }
         public int OwnerId { get; set; }
         public int CategoryId { get; set; }
         public string? ImagePathOne { get; set; }
@@ -23,5 +25,7 @@ namespace Application.Travel.Features.CQRS.Results.UserResults
         public int BathNumber { get; set; }
         public int MaxAccommodates { get; set; }
         public decimal Price { get; set; }
+        public int? AirQuality { get; set; }
+        public string? AirDescription { get; set; }
     }
 }

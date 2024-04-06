@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Persistence.Travel.Migrations
 {
     /// <inheritdoc />
-    public partial class Azuredb : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -105,6 +105,40 @@ namespace Persistence.Travel.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AI",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    PreferredCategories = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HomeLatitude = table.Column<double>(type: "float", nullable: false),
+                    HomeLongitude = table.Column<double>(type: "float", nullable: false),
+                    SurveyId = table.Column<int>(type: "int", nullable: true),
+                    LocationId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AI", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AI_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AI_Surveys_SurveyId",
+                        column: x => x.SurveyId,
+                        principalTable: "Surveys",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AI_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Owners",
                 columns: table => new
                 {
@@ -132,16 +166,14 @@ namespace Persistence.Travel.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    RolesId = table.Column<int>(type: "int", nullable: false),
-                    UserId1 = table.Column<int>(type: "int", nullable: true)
+                    RoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserRoles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserRoles_Roles_RolesId",
-                        column: x => x.RolesId,
+                        name: "FK_UserRoles_Roles_RoleId",
+                        column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -151,10 +183,27 @@ namespace Persistence.Travel.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Place",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Latitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false),
+                    Types = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Score = table.Column<double>(type: "float", nullable: false),
+                    AIRecommendationId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Place", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserRoles_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
+                        name: "FK_Place_AI_AIRecommendationId",
+                        column: x => x.AIRecommendationId,
+                        principalTable: "AI",
                         principalColumn: "Id");
                 });
 
@@ -164,6 +213,7 @@ namespace Persistence.Travel.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    HouseTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LocationId = table.Column<int>(type: "int", nullable: false),
                     OwnerId = table.Column<int>(type: "int", nullable: false),
                     CategoryName = table.Column<int>(type: "int", nullable: false),
@@ -175,7 +225,9 @@ namespace Persistence.Travel.Migrations
                     BedNumber = table.Column<int>(type: "int", nullable: false),
                     BathNumber = table.Column<int>(type: "int", nullable: false),
                     MaxAccommodates = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AirQuality = table.Column<int>(type: "int", nullable: true),
+                    AirDescription = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -226,15 +278,14 @@ namespace Persistence.Travel.Migrations
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     HomeownerId = table.Column<int>(type: "int", nullable: false),
-                    UserId1 = table.Column<int>(type: "int", nullable: true),
-                    UserId2 = table.Column<int>(type: "int", nullable: false)
+                    OwnerId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_OwnerReviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OwnerReviews_Owners_HomeownerId",
-                        column: x => x.HomeownerId,
+                        name: "FK_OwnerReviews_Owners_OwnerId",
+                        column: x => x.OwnerId,
                         principalTable: "Owners",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -242,12 +293,8 @@ namespace Persistence.Travel.Migrations
                         name: "FK_OwnerReviews_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_OwnerReviews_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -257,8 +304,7 @@ namespace Persistence.Travel.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    HousingId = table.Column<int>(type: "int", nullable: false),
-                    HousingId1 = table.Column<int>(type: "int", nullable: true)
+                    HousingId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -267,17 +313,14 @@ namespace Persistence.Travel.Migrations
                         name: "FK_Favorites_Housings_HousingId",
                         column: x => x.HousingId,
                         principalTable: "Housings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Favorites_Housings_HousingId1",
-                        column: x => x.HousingId1,
-                        principalTable: "Housings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Favorites_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -330,8 +373,7 @@ namespace Persistence.Travel.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     HousingId = table.Column<int>(type: "int", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HousingId1 = table.Column<int>(type: "int", nullable: true)
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -340,17 +382,14 @@ namespace Persistence.Travel.Migrations
                         name: "FK_HousingReviews_Housings_HousingId",
                         column: x => x.HousingId,
                         principalTable: "Housings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_HousingReviews_Housings_HousingId1",
-                        column: x => x.HousingId1,
-                        principalTable: "Housings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_HousingReviews_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -366,8 +405,7 @@ namespace Persistence.Travel.Migrations
                     NumberOfAdults = table.Column<int>(type: "int", nullable: false),
                     NumberOfChildren = table.Column<int>(type: "int", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HousingId1 = table.Column<int>(type: "int", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -376,28 +414,35 @@ namespace Persistence.Travel.Migrations
                         name: "FK_Reservations_Housings_HousingId",
                         column: x => x.HousingId,
                         principalTable: "Housings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Reservations_Housings_HousingId1",
-                        column: x => x.HousingId1,
-                        principalTable: "Housings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AI_LocationId",
+                table: "AI",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AI_SurveyId",
+                table: "AI",
+                column: "SurveyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AI_UserId",
+                table: "AI",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Favorites_HousingId",
                 table: "Favorites",
                 column: "HousingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Favorites_HousingId1",
-                table: "Favorites",
-                column: "HousingId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Favorites_UserId",
@@ -421,11 +466,6 @@ namespace Persistence.Travel.Migrations
                 column: "HousingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HousingReviews_HousingId1",
-                table: "HousingReviews",
-                column: "HousingId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_HousingReviews_UserId",
                 table: "HousingReviews",
                 column: "UserId");
@@ -433,8 +473,7 @@ namespace Persistence.Travel.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Housings_LocationId",
                 table: "Housings",
-                column: "LocationId",
-                unique: true);
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Housings_OwnerId",
@@ -447,9 +486,9 @@ namespace Persistence.Travel.Migrations
                 column: "HomeOwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OwnerReviews_HomeownerId",
+                name: "IX_OwnerReviews_OwnerId",
                 table: "OwnerReviews",
-                column: "HomeownerId");
+                column: "OwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OwnerReviews_UserId",
@@ -457,14 +496,14 @@ namespace Persistence.Travel.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OwnerReviews_UserId1",
-                table: "OwnerReviews",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Owners_UserId",
                 table: "Owners",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Place_AIRecommendationId",
+                table: "Place",
+                column: "AIRecommendationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_HousingId",
@@ -472,29 +511,19 @@ namespace Persistence.Travel.Migrations
                 column: "HousingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_HousingId1",
-                table: "Reservations",
-                column: "HousingId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Reservations_UserId",
                 table: "Reservations",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_RolesId",
+                name: "IX_UserRoles_RoleId",
                 table: "UserRoles",
-                column: "RolesId");
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_UserId",
                 table: "UserRoles",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_UserId1",
-                table: "UserRoles",
-                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_GenderId",
@@ -524,19 +553,25 @@ namespace Persistence.Travel.Migrations
                 name: "OwnerReviews");
 
             migrationBuilder.DropTable(
+                name: "Place");
+
+            migrationBuilder.DropTable(
                 name: "Reservations");
 
             migrationBuilder.DropTable(
-                name: "Surveys");
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
-                name: "UserRoles");
+                name: "AI");
 
             migrationBuilder.DropTable(
                 name: "Housings");
 
             migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Surveys");
 
             migrationBuilder.DropTable(
                 name: "Locations");

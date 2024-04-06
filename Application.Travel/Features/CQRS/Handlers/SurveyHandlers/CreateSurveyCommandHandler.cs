@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.ReservationCommands;
 using Application.Travel.Features.CQRS.Commands.SurveyCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
@@ -21,12 +22,14 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         private readonly IRepository<Survey> _repository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IUow _uow;
 
-        public CreateSurveyCommandHandler(IRepository<Survey> repository, IMapper mapper, IHttpContextAccessor contextAccessor)
+        public CreateSurveyCommandHandler(IRepository<Survey> repository, IMapper mapper, IHttpContextAccessor contextAccessor, IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _contextAccessor = contextAccessor;
+            _uow = uow;
             
         }
 
@@ -59,6 +62,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
 
                 await _repository.AddAsync(values);
 
+                await _uow.SaveChangeAsync();
                 return Response<Survey>.Success(values);
             }
             catch (ValidateException ex)

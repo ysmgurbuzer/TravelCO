@@ -9,6 +9,7 @@ using Application.Travel.Features.CQRS.Queries.ReservationQueries;
 using Application.Travel.Interfaces;
 using Domain.Travel.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -17,20 +18,25 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TravelCoAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationsController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly IRepository<Housing> _repo;
+        private readonly IRepository<Location> _locationRepo;
         private readonly ILogger<ReservationsController> _logger;
 
-        public ReservationsController(IMediator mediator, IRepository<Housing> repo, ILogger<ReservationsController> logger)
+        public ReservationsController(IMediator mediator, IRepository<Housing> repo, ILogger<ReservationsController> logger, IRepository<Location> locationRepo)
         {
             _mediator = mediator;
             _repo = repo;
             _logger = logger;
+            _locationRepo = locationRepo;   
         }
+
+        //getbyıd kullanarak ownerın evine yapılan rezervasyonları görüntüle
 
         [HttpGet]
         public async Task<IActionResult> ListUsersReservations()
@@ -66,10 +72,11 @@ namespace TravelCoAPI.Controllers
                 {
                     var ıd = command.HousingId;
                     var house = await _repo.GetByIdAsync(ıd);
-                    var latitude = house.Location.latitude;
-                    var longitude = house.Location.longitude;
+                    var location = await _locationRepo.GetByIdAsync(house.LocationId);
+                    var latitude = location.latitude;
+                    var longitude = location.longitude;
 
-                    var nearbyPlacesUrl = "https://localhost:44356/api/GooglePlacesAPI";
+                    var nearbyPlacesUrl = "http://localhost:19175/api/GooglePlacesAPI";
 
                     using (HttpClient client = new HttpClient())
                     {
@@ -92,10 +99,7 @@ namespace TravelCoAPI.Controllers
                                 HomeLongitude = longitude
                             };
                             var recommendationResult = await _mediator.Send(recommendationCommand);
-                            if (recommendationResult.Succeeded)
-                            {
-                                var aıResult = await _mediator.Send(new ExportToExcelCommand());
-                            }
+                            
                            
                           
                         }

@@ -27,7 +27,10 @@
             var placeInfo = new List<object> {homeLatitude,homelong ,latitude, longitude, types, rating };
             _placesList.Add(placeInfo);
         }
-
+        public static void ClearPlacesList()
+        {
+            _placesList.Clear();
+        }
         public static List<List<object>> GetPlacesList() => _placesList;
     }
 }

@@ -49,7 +49,7 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
                     return Response<GetReservationByIdQueryResult>.Fail("Reservation not found.");
                 }
 
-                var housingReservations =  _housingRepository.GetList(r => r.Id == reservation.HousingId);
+                var housingReservations =  _housingRepository.GetByFilter(r => r.Id == reservation.HousingId);
                 var userIsOwner = await CheckUserOwnershipAsync(reservation.HousingId, userIdClaim);
 
                 if (housingReservations!=null && userIsOwner)

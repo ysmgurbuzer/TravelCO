@@ -3,6 +3,7 @@ using Application.Travel.Features.CQRS.Events;
 using Application.Travel.Features.CQRS.Handlers.ReservationHandlers;
 using Application.Travel.Interfaces;
 using Application.Travel.Models;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
@@ -25,12 +26,15 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         private readonly IRepository<Reservation> _ReservationRepository;
         private readonly IRepository<Survey> _SurveyRepository;
         private readonly IMediator _mediator;
+        private readonly AIRecommendationServiceBuilder _ai;
+        private readonly IUow _uow;
         public CreateRecommendationCommandHandler(IRepository<AIRecommendation> repository,
             IMapper mapper, 
             IHttpContextAccessor contextAccessor,
             IRepository<Reservation> ReservationRepository,
             IRepository<Survey> SurveyRepository,
-            IMediator mediator
+            IMediator mediator,
+            IUow uow
 
             )
         {
@@ -40,6 +44,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
             _ReservationRepository = ReservationRepository;
             _SurveyRepository = SurveyRepository;
             _mediator = mediator;
+            _uow = uow; 
 
         }
 
@@ -53,49 +58,48 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
             {
                 var userIdClaim = Int32.Parse(_contextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
               
-                var surveyResults =  _SurveyRepository.GetList(s => s.UserId == userIdClaim);
+                var surveyResults =  _SurveyRepository.GetByFilter(s => s.UserId == userIdClaim);
 
 
                 var homeLatitude = request.HomeLatitude;
                 var homeLongitude = request.HomeLongitude;
 
-                // Evin konumuyla eşleşen yerleri bul
+             
                 var matchingPlaces = GetPlacesMatchingHomeLocation(homeLatitude, homeLongitude);
 
-                // Evin konumuyla eşleşen yer bulunamazsa hata döndür
+                
                 if (matchingPlaces.Count == 0)
                 {
                     return Response<AIRecommendation>.Fail("Evin enlem ve boylam değerlerine eşit olan bir yer bulunamadı.");
                 }
 
-                // Rastgele 3 yer seç
-                var random = new Random();
-                var placeIndex1 = random.Next(0, matchingPlaces.Count);
-                var placeIndex2 = random.Next(0, matchingPlaces.Count);
-                var placeIndex3 = random.Next(0, matchingPlaces.Count);
 
-                // Yerlerin özelliklerini AIRecommendation nesnesine aktar
+
                 var values = new AIRecommendation
-                {
+                {   
                     UserId = userIdClaim,
                     PreferredCategories = surveyResults.PreferredCategories,
                     HomeLatitude = homeLatitude,
                     HomeLongitude = homeLongitude,
-                    Place1Latitude = (double)matchingPlaces[placeIndex1][2],
-                    Place1Longitude = (double)matchingPlaces[placeIndex1][3],
-                    Place1Type = (List<string>)matchingPlaces[placeIndex1][4],
-                    Place2Latitude = (double)matchingPlaces[placeIndex2][2],
-                    Place2Longitude = (double)matchingPlaces[placeIndex2][3],
-                    Place2Type = (List<string>)matchingPlaces[placeIndex2][4],
-                    Place3Latitude = (double)matchingPlaces[placeIndex3][2],
-                    Place3Longitude = (double)matchingPlaces[placeIndex3][3],
-                    Place3Type = (List<string>)matchingPlaces[placeIndex3][4]
+                    Places = new List<Domain.Travel.Entities.Place>()
                 };
 
-                Console.WriteLine((double)PlaceStorage.GetPlacesList()[placeIndex1][0]);
-                Console.WriteLine((double)PlaceStorage.GetPlacesList()[placeIndex1][1]);
+                for (int i = 0; i < matchingPlaces.Count; i++)
+                {
+                    var placeIndex = i + 1;
+                    var place = new Domain.Travel.Entities.Place
+                    {
+                        Latitude = (double)matchingPlaces[i][2],
+                        Longitude = (double)matchingPlaces[i][3],
+                        Types = (List<string>)matchingPlaces[i][4],
+                        Score = 0 
+                    };
+                    values.Places.Add(place);
+                }
+
                 await _repository.AddAsync(values);
-             
+                _uow.SaveChangeAsync();
+
                 return Response<AIRecommendation>.Success(values);
             }
             catch (ValidateException ex)
@@ -116,6 +120,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         private List<List<object>> GetPlacesMatchingHomeLocation(double homeLatitude, double homeLongitude)
         {
             var placesList = PlaceStorage.GetPlacesList();
+            
             var matchingPlaces = new List<List<object>>();
             foreach (var place in placesList)
             {

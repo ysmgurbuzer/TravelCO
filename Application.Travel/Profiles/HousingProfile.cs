@@ -1,6 +1,8 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Features.CQRS.Commands.HousingDescriptionCommands;
+using Application.Travel.Features.CQRS.Commands.HousingFeatureCommands;
 using Application.Travel.Features.CQRS.Results.HousingDescriptionResults;
+using Application.Travel.Features.CQRS.Results.HousingFeatureResults;
 using Application.Travel.Features.CQRS.Results.HousingResults;
 using Application.Travel.Features.CQRS.Results.UserResults;
 using AutoMapper;
@@ -29,6 +31,16 @@ namespace Application.Travel.Profiles
             CreateMap<DescriptionCommand, HousingDescriptions>().ReverseMap();
             CreateMap<HousingDescriptions, GetDescriptionByIdQueryResult>().ReverseMap();
             CreateMap<GetDescriptionQueryResult, HousingDescriptions>().ReverseMap();
+          
+            CreateMap<GetHousingByOwnerResult, Housing>().ReverseMap();
+            CreateMap<CreateHousingFeatureCommand, HousingFeatures>().ReverseMap(); 
+                CreateMap<GetHousingFeaturesQueryResult, HousingFeatures>().ReverseMap();
+
+            CreateMap<FeatureCommand, HousingFeatures>().ReverseMap();
+               
+            CreateMap<HousingFeatures, GetHousingFeatureByIdQueryResult>().ReverseMap();
+
+            CreateMap<HousingFeatures, List<GetHousingFeatureByIdQueryResult>>().ReverseMap();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingDescriptionCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using AutoMapper;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
@@ -20,13 +21,15 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingDescriptionHandlers
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRepository<Housing> _HousingRepository;
+        private readonly IUow _uow;
 
-        public CreateDescriptionCommandHandler(IRepository<HousingDescriptions> repository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IRepository<Housing> HousingRepository)
+        public CreateDescriptionCommandHandler(IRepository<HousingDescriptions> repository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IRepository<Housing> HousingRepository,IUow uow)
         {
             _repository = repository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor; 
             _HousingRepository = HousingRepository;
+            _uow = uow;
         }
 
 
@@ -43,6 +46,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingDescriptionHandlers
                 if (OwnerValues.Any(owner => owner.Id == newDescription.HousingId))
                 {
                     await _repository.AddAsync(newDescription);
+                    await _uow.SaveChangeAsync();
                     return Response<HousingDescriptions>.Success(newDescription);
                 }
                 else
