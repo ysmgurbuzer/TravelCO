@@ -57,5 +57,9 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingFeatureHandlers
                 return Response<List<GetHousingFeatureByIdQueryResult>>.Fail($"Internal Server Error: {ex.Message}");
             }
         }
+
+
+
+            
     }
 }
