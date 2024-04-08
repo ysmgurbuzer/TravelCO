@@ -80,7 +80,20 @@ namespace Domain.Travel.Enums
            
             return (int)category;
         }
+        private static readonly Dictionary<int, string> CategoryNames = new Dictionary<int, string>();
 
+       
 
+        public static string GetName(int categoryId)
+        {
+            if (CategoryNames.ContainsKey(categoryId))
+            {
+                return CategoryNames[categoryId];
+            }
+            else
+            {
+                return null; 
+            }
+        }
     }
 }
