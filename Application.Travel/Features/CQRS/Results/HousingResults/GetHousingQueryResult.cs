@@ -1,8 +1,10 @@
 ﻿
+using Domain.Travel.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Application.Travel.Features.CQRS.Results.UserResults
@@ -27,5 +29,7 @@ namespace Application.Travel.Features.CQRS.Results.UserResults
         public decimal Price { get; set; }
         public int? AirQuality { get; set; }
         public string? AirDescription { get; set; }
+        [JsonIgnore]
+        public Location Location { get; set; }
     }
 }
