@@ -6,6 +6,7 @@ using Application.Travel.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -27,7 +28,6 @@ namespace TravelCoAPI.Controllers
             _logger = logger;
         }
 
-
         [HttpPost]
         public async Task<IActionResult> GetNearbyPlaces([FromBody] LocationofHomeModel home)
         {
@@ -37,7 +37,7 @@ namespace TravelCoAPI.Controllers
                 var apiUrl = "https://places.googleapis.com/v1/places:searchNearby";
                 var includedTypes = new[]
   {
-    
+
     "convention_center",
     "cultural_center",
     "hiking_area",
@@ -121,22 +121,23 @@ namespace TravelCoAPI.Controllers
                         if (!string.IsNullOrEmpty(contentType))
                         {
                             var places = JsonConvert.DeserializeObject<GooglePlacesResponseModel>(jsonResponse);
-                          
+
                             foreach (var place in places.Places)
                             {
-                                PlaceStorage.AddPlace(home.latitude,home.longitude,place.Location.Latitude, place.Location.Longitude, place.Types, place.Rating);
+                                PlaceStorage.AddPlace(home.latitude, home.longitude, place.Location.Latitude, place.Location.Longitude, place.Types, place.Rating);
                             }
                             var placesList = PlaceStorage.GetPlacesList();
 
                             var a = placesList.Count;
-                           
+
 
                             int idCount = places.Places.Count;
 
                             var jsonResponseObj = new
                             {
                                 places = places,
-                                idCount = idCount                     };
+                                idCount = idCount
+                            };
 
                             var jsonResponsee = JsonConvert.SerializeObject(jsonResponseObj);
 
@@ -156,8 +157,6 @@ namespace TravelCoAPI.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
-
 
     }
 }

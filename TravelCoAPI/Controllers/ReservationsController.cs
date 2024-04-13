@@ -7,6 +7,8 @@ using Application.Travel.Features.CQRS.Handlers.AIRecommendationHandlers;
 using Application.Travel.Features.CQRS.Queries.FavoritesQueries;
 using Application.Travel.Features.CQRS.Queries.ReservationQueries;
 using Application.Travel.Interfaces;
+using Application.Travel.Models;
+using Application.Travel.Services;
 using Domain.Travel.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +20,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TravelCoAPI.Controllers
 {
-    [Authorize]
+   
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationsController : ControllerBase
@@ -27,13 +29,20 @@ namespace TravelCoAPI.Controllers
         private readonly IRepository<Housing> _repo;
         private readonly IRepository<Location> _locationRepo;
         private readonly ILogger<ReservationsController> _logger;
-
-        public ReservationsController(IMediator mediator, IRepository<Housing> repo, ILogger<ReservationsController> logger, IRepository<Location> locationRepo)
+        private readonly IRepository<AIRecommendation> _airepo;
+        private readonly IRepository<Domain.Travel.Entities.Place> _placerepo;
+        private readonly IRepository<PlaceEntity> _plcepo;
+        private readonly IUow _uow;
+        public ReservationsController(IMediator mediator, IRepository<Housing> repo, ILogger<ReservationsController> logger, IRepository<Location> locationRepo, IRepository<AIRecommendation> airepo, IRepository<Domain.Travel.Entities.Place> placerepo,IUow uow, IRepository<PlaceEntity> plcepo)
         {
             _mediator = mediator;
             _repo = repo;
             _logger = logger;
-            _locationRepo = locationRepo;   
+            _locationRepo = locationRepo;
+            _airepo = airepo;
+            _placerepo = placerepo;
+            _uow = uow;
+            _plcepo = plcepo;   
         }
 
         //getbyıd kullanarak ownerın evine yapılan rezervasyonları görüntüle
@@ -61,6 +70,36 @@ namespace TravelCoAPI.Controllers
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
+
+        [HttpGet("{housingId}")]
+        public async Task<IActionResult> ListOwnersReservations(int housingId)
+        {
+            try
+            {
+                var result = await _mediator.Send(new GetReservationByHousingIdForOwnerQuery(housingId));
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User reservations listed successfully.");
+                    return Ok(result.Data);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to list user reservations: {Message}", result.Message);
+                    return BadRequest(result.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while listing user reservations.");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+      
+     
+
+
 
         [HttpPost]
         public async Task<IActionResult> CreateReservation(CreateReservationCommand command)

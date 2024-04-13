@@ -92,6 +92,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
                         Latitude = (double)matchingPlaces[i][2],
                         Longitude = (double)matchingPlaces[i][3],
                         Types = (List<string>)matchingPlaces[i][4],
+                        Rate= (double)matchingPlaces[i][5],
                         Score = 0 
                     };
                     values.Places.Add(place);

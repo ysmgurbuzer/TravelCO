@@ -12,8 +12,8 @@ using Persistence.Travel.Context;
 namespace Persistence.Travel.Migrations
 {
     [DbContext(typeof(TravelContext))]
-    [Migration("20240401182204_Initial")]
-    partial class Initial
+    [Migration("20240410084711_newLocalDatabase")]
+    partial class newLocalDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

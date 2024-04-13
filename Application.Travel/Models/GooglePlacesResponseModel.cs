@@ -22,9 +22,9 @@
     {
         private static readonly List<List<object>> _placesList = new List<List<object>>();
 
-        public static void AddPlace(double homeLatitude,double homelong,double latitude, double longitude, List<string> types, double rating)
+        public static void AddPlace(double homeLatitude, double homelong, double latitude, double longitude, List<string> types, double rating)
         {
-            var placeInfo = new List<object> {homeLatitude,homelong ,latitude, longitude, types, rating };
+            var placeInfo = new List<object> { homeLatitude, homelong, latitude, longitude, types, rating };
             _placesList.Add(placeInfo);
         }
         public static void ClearPlacesList()

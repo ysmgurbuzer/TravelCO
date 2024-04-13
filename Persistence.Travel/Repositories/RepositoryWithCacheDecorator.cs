@@ -4,6 +4,7 @@ using Domain.Travel.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
+using OfficeOpenXml.Filter;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -103,35 +104,41 @@ namespace Persistence.Travel.Repositories
      
         public async Task<T> GetByIdAsync(int id)
         {
-            if (await _cacheRepository.KeyExistsAsync(_key))
+            var entityId = id.ToString();
+
+            var cachedData = await _cacheRepository.HashGetAsync(_key, entityId);
+            if (cachedData.HasValue)
             {
-                var data = await _cacheRepository.HashGetAsync(_key, RedisValue.Unbox(id));
-                return data.HasValue ? JsonSerializer.Deserialize<T>(data) : null;
-
+                return JsonSerializer.Deserialize<T>(cachedData);
             }
-
-            var dbData = await LoadToCacheFromDbAsync();
-            PropertyInfo prop = typeof(T).GetProperty("Id");
-            return dbData.FirstOrDefault(x => prop.GetValue(x).ToString() == id.ToString());
+            else
+            {
+                var data = await _repository.GetByIdAsync(id); 
+                {
+                    await _cacheRepository.HashSetAsync(_key, entityId, JsonSerializer.Serialize(data));
+                }
+                return data;
+            }
         }
 
         public List<T> GetList(Expression<Func<T, bool>> filter)
         {
-            var cacheKey = $"{_key}:{filter}";
+            var cacheKey = $"{_key}";
+            var cachedData = _cacheRepository.HashGet(_key, cacheKey);
 
-            var cachedData =  _cacheRepository.HashGet(_key, cacheKey);
             if (cachedData.HasValue)
             {
                 var cachedResult = JsonSerializer.Deserialize<List<T>>(cachedData);
+                var hasMatchingDataInCache = cachedResult.Any(filter.Compile());
 
-                return cachedResult;
+                if (hasMatchingDataInCache)
+                    return cachedResult.Where(filter.Compile()).ToList();
             }
-            else
-            {
-                var result =  _repository.GetList(filter);
-                 _cacheRepository.HashSet(_key, cacheKey, JsonSerializer.Serialize(result));
-                return result;
-            }
+
+           
+            var result = _repository.GetList(filter);
+            _cacheRepository.HashSet(_key, cacheKey, JsonSerializer.Serialize(result));
+            return result;
         }
 
 

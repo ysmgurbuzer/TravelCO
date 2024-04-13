@@ -27,7 +27,7 @@ namespace TravelCoAPI.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet("list")]
         public async Task<IActionResult> HousingList()
         {
             try
@@ -52,7 +52,7 @@ namespace TravelCoAPI.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("housing/{id}")]
         public async Task<IActionResult> GetHousing(int id)
         {
             try
@@ -192,7 +192,33 @@ namespace TravelCoAPI.Controllers
 
         }
 
+        [HttpGet("housing/category/{categoryId}")]
+        public async Task<IActionResult> GetHousingByCategory(int categoryId)
+        {
+            try
+            {
+                var response = await _mediator.Send(new GetHousingByCategoryQuery(categoryId));
 
+                if (response.Succeeded)
+                {
+                    _logger.LogInformation("Housing retrieved successfully.");
+                   
+
+                   
+                    return Ok(response.Data);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to retrieve housing: {Message}", response.Message);
+                    return BadRequest(response.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving housing.");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
 
     }
 }
