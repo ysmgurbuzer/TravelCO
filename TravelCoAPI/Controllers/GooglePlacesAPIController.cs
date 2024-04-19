@@ -98,7 +98,7 @@ namespace TravelCoAPI.Controllers
                         circle = new
                         {
                             center = new { home.latitude, home.longitude },
-                            radius = 1000
+                            radius = 30000
                         }
                     },
                     includedTypes
@@ -121,8 +121,12 @@ namespace TravelCoAPI.Controllers
                         if (!string.IsNullOrEmpty(contentType))
                         {
                             var places = JsonConvert.DeserializeObject<GooglePlacesResponseModel>(jsonResponse);
+                            var shuffledPlaces = ShufflePlaces(places.Places);
 
-                            foreach (var place in places.Places)
+                            
+                            var selectedPlaces = shuffledPlaces.Take(20).ToList();
+
+                            foreach (var place in selectedPlaces)
                             {
                                 PlaceStorage.AddPlace(home.latitude, home.longitude, place.Location.Latitude, place.Location.Longitude, place.Types, place.Rating);
                             }
@@ -158,6 +162,19 @@ namespace TravelCoAPI.Controllers
             }
         }
 
+
+        private List<Application.Travel.Models.Place> ShufflePlaces(List<Application.Travel.Models.Place> places)
+        {
+            Random rnd = new Random();
+            for (int i = places.Count - 1; i > 0; i--)
+            {
+                int randomIndex = rnd.Next(0, i + 1);
+                Application.Travel.Models.Place temp = places[i];
+                places[i] = places[randomIndex];
+                places[randomIndex] = temp;
+            }
+            return places;
+        }
     }
 }
 
