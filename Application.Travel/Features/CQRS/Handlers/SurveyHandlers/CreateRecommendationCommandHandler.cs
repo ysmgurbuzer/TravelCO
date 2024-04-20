@@ -122,6 +122,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
                         Console.WriteLine($"Hata kodu: {response.StatusCode}");
                     }
                 }
+                await _uow.SaveChangeAsync();
 
 
              
