@@ -361,8 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-
-appsettings.Production.json
-appsettings.Development.json
-appsettings.json
-TravelCoAPI/appsettings.json
+TravelCO\TravelCoAPI\appsettings.Development.json
+TravelCO\TravelCoAPI\appsettings.Production.json
+TravelCO\TravelCoAPI\appsettings.json
