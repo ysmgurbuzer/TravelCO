@@ -101,7 +101,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
                 }
 
                 await _repository.AddAsync(values);
-
+                await _uow.SaveChangeAsync();
 
                 using (var client = new HttpClient())
                 {
@@ -122,9 +122,9 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
                         Console.WriteLine($"Hata kodu: {response.StatusCode}");
                     }
                 }
-
-
              
+
+
 
                 return Response<AIRecommendation>.Success(values);
             }
