@@ -34,6 +34,7 @@ namespace Domain.Travel.Entities
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public List<string> Types { get; set; }
+        public double Rate { get; set; }
         public double Score { get; set; }
     }
 

@@ -1,5 +1,6 @@
 ﻿using Application.Travel.Features.CQRS.Commands.HousingCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Services;
 using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
@@ -16,11 +17,13 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
     {
         private readonly IRepository<Housing> _repository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUow _uow;
 
-        public RemoveHousingCommandHandler(IRepository<Housing> repository, IHttpContextAccessor httpContextAccessor)
+        public RemoveHousingCommandHandler(IRepository<Housing> repository, IHttpContextAccessor httpContextAccessor,IUow uow)
         {
             _repository = repository;
             _httpContextAccessor = httpContextAccessor;
+            _uow = uow;
         }
 
         public async Task<Response<Housing>> Handle(RemoveHousingCommand request, CancellationToken cancellationToken)
@@ -48,7 +51,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
                 }
 
                  _repository.Delete(housing);
-
+                await _uow.SaveChangeAsync();
                 return Response<Housing>.Success("Housing removed successfully.");
             }
             catch (Exception ex)

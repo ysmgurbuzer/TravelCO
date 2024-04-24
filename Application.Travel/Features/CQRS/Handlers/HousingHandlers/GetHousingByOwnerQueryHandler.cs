@@ -48,6 +48,7 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
 
                     var result = _mapper.Map<List<GetHousingByOwnerResult>>(values);
 
+
                     return Response<List<GetHousingByOwnerResult>>.Success(result);
                 }
                 else

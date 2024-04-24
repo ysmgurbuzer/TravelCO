@@ -30,7 +30,9 @@ namespace Application.Travel.Profiles
                 .ForMember(dest => dest.longitude, opt => opt.MapFrom(src => src.longitude))
                 .ForMember(dest => dest.latitude, opt => opt.MapFrom(src => src.latitude));
 
-            CreateMap<GetReservationQueryResult, Reservation>().ReverseMap();
+            CreateMap<GetReservationQueryResult, Reservation>().ReverseMap(); 
+
+                 CreateMap<GetReservationByHousingIdForOwnerQueryResult, Reservation>().ReverseMap();
         }
     }
 }

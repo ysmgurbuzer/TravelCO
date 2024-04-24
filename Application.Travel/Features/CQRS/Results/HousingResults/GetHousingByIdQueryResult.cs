@@ -15,7 +15,7 @@ namespace Application.Travel.Features.CQRS.Results.HousingResults
         public string HouseTitle { get; set; }
         public int LocationId { get; set; }
         public int OwnerId { get; set; }
-        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
         public string? ImagePathOne { get; set; }
         public string? ImagePathTwo { get; set; }
         public string? ImagePathThree { get; set; }

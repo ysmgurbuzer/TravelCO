@@ -8,8 +8,17 @@ services:
    volumes:
     - redis_volume:/data
 
+  TravelCoDb:
+   container_name: TravelCoDb
+   restart: always
+   ports:
+     - "1433:1433"
+   volumes:
+    - TravelCoDb_volume:/var/opt/mssql/data
+   environment:
+     - ACCEPT_EULA=Y
+     - SA_PASSWORD=Yg231101.
 
- 
 
   travelcoapi:
     environment:

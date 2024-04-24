@@ -6,6 +6,7 @@ using Application.Travel.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -27,7 +28,6 @@ namespace TravelCoAPI.Controllers
             _logger = logger;
         }
 
-
         [HttpPost]
         public async Task<IActionResult> GetNearbyPlaces([FromBody] LocationofHomeModel home)
         {
@@ -37,7 +37,7 @@ namespace TravelCoAPI.Controllers
                 var apiUrl = "https://places.googleapis.com/v1/places:searchNearby";
                 var includedTypes = new[]
   {
-    
+
     "convention_center",
     "cultural_center",
     "hiking_area",
@@ -98,7 +98,7 @@ namespace TravelCoAPI.Controllers
                         circle = new
                         {
                             center = new { home.latitude, home.longitude },
-                            radius = 1000
+                            radius = 30000
                         }
                     },
                     includedTypes
@@ -121,22 +121,27 @@ namespace TravelCoAPI.Controllers
                         if (!string.IsNullOrEmpty(contentType))
                         {
                             var places = JsonConvert.DeserializeObject<GooglePlacesResponseModel>(jsonResponse);
-                          
-                            foreach (var place in places.Places)
+                            var shuffledPlaces = ShufflePlaces(places.Places);
+
+                            
+                            var selectedPlaces = shuffledPlaces.Take(20).ToList();
+
+                            foreach (var place in selectedPlaces)
                             {
-                                PlaceStorage.AddPlace(home.latitude,home.longitude,place.Location.Latitude, place.Location.Longitude, place.Types, place.Rating);
+                                PlaceStorage.AddPlace(home.latitude, home.longitude, place.Location.Latitude, place.Location.Longitude, place.Types, place.Rating);
                             }
                             var placesList = PlaceStorage.GetPlacesList();
 
                             var a = placesList.Count;
-                           
+
 
                             int idCount = places.Places.Count;
 
                             var jsonResponseObj = new
                             {
                                 places = places,
-                                idCount = idCount                     };
+                                idCount = idCount
+                            };
 
                             var jsonResponsee = JsonConvert.SerializeObject(jsonResponseObj);
 
@@ -158,7 +163,18 @@ namespace TravelCoAPI.Controllers
         }
 
 
-
+        private List<Application.Travel.Models.Place> ShufflePlaces(List<Application.Travel.Models.Place> places)
+        {
+            Random rnd = new Random();
+            for (int i = places.Count - 1; i > 0; i--)
+            {
+                int randomIndex = rnd.Next(0, i + 1);
+                Application.Travel.Models.Place temp = places[i];
+                places[i] = places[randomIndex];
+                places[randomIndex] = temp;
+            }
+            return places;
+        }
     }
 }
 

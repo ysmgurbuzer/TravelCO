@@ -9,6 +9,7 @@ using Domain.Travel.Entities;
 using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         private readonly IMediator _mediator;
         private readonly AIRecommendationServiceBuilder _ai;
         private readonly IUow _uow;
+        private string apiUrl = "http://127.0.0.1:5000/reservation";
         public CreateRecommendationCommandHandler(IRepository<AIRecommendation> repository,
             IMapper mapper, 
             IHttpContextAccessor contextAccessor,
@@ -92,13 +94,37 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
                         Latitude = (double)matchingPlaces[i][2],
                         Longitude = (double)matchingPlaces[i][3],
                         Types = (List<string>)matchingPlaces[i][4],
+                        Rate= (double)matchingPlaces[i][5],
                         Score = 0 
                     };
                     values.Places.Add(place);
                 }
 
                 await _repository.AddAsync(values);
-                _uow.SaveChangeAsync();
+                await _uow.SaveChangeAsync();
+
+                using (var client = new HttpClient())
+                {
+                   
+                    var json = Newtonsoft.Json.JsonConvert.SerializeObject(values);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                  
+                    var response = await client.PostAsync(apiUrl, content);
+
+                  
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Rezervasyon oluşturuldu.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Hata kodu: {response.StatusCode}");
+                    }
+                }
+             
+
+
 
                 return Response<AIRecommendation>.Success(values);
             }

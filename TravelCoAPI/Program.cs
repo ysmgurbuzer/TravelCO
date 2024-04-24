@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Application.Travel;
 using Infrastructure.Travel.Tools;
 using Hangfire;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +39,7 @@ builder.Services.AddCors(opt =>
             .AllowCredentials();
     });
 });
-
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 builder.Services.AddCors(opt =>
 opt.AddPolicy("CorsPolicy", builder =>
 {

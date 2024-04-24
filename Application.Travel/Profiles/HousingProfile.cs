@@ -41,6 +41,8 @@ namespace Application.Travel.Profiles
             CreateMap<HousingFeatures, GetHousingFeatureByIdQueryResult>().ReverseMap();
 
             CreateMap<HousingFeatures, List<GetHousingFeatureByIdQueryResult>>().ReverseMap();
+            
+            CreateMap<Housing, GetHousingByCategoryQueryResult>().ReverseMap();
         }
     }
 }

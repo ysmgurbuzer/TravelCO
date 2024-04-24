@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Application.Travel.Features.CQRS.Results.HousingResults
 {
-    public class GetHousingByOwnerResult
+    public class GetHousingByCategoryQueryResult
     {
         public int Id { get; set; }
         public string HouseTitle { get; set; }
-      
+
         public int OwnerId { get; set; }
         public string CategoryName { get; set; }
         public string? ImagePathOne { get; set; }
