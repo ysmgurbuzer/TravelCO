@@ -44,6 +44,8 @@ namespace Application.Travel.Features.CQRS.Handlers.HousingHandlers
                         {
                            
                             result.Location = location;
+                            result.LocationCity= location.City;
+                            result.LocationCountry= location.Country;
                             return Response<GetHousingByIdQueryResult>.Success(result);
                         }
                         else
