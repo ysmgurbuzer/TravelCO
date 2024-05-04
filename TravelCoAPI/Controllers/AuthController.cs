@@ -41,7 +41,7 @@ namespace TravelCoAPI.Controllers
                         _logger.LogInformation("User logged in successfully.");
                         var tokenResponse = _jwtTokenGenerator.GenerateToken(values.Data);
                     
-                        return Ok(new { token = tokenResponse.Token, expiration = tokenResponse.ExpireDate });
+                        return Ok(new { tokenResponse.Token});
                     }
                     else
                     {

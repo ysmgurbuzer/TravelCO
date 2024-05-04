@@ -96,11 +96,11 @@ namespace TravelCoAPI.Controllers
             }
         }
 
-      
-     
 
 
 
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateReservation(CreateReservationCommand command)
         {
