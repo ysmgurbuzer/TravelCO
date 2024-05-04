@@ -16,6 +16,7 @@ using Application.Travel;
 using Infrastructure.Travel.Tools;
 using Hangfire;
 using OfficeOpenXml;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +29,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddDbContext<TravelContext>(opt => opt.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings:DefaultConnectionString").Value));
+var hangfireConnectionString = builder.Configuration.GetConnectionString("HangfireConnection");
 
+
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(hangfireConnectionString));
+
+
+
+builder.Services.AddHangfireServer();
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("RoamlyApiCors", opts =>
@@ -163,5 +175,5 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 redisService.Connect();
 app.MapControllers();
 app.MapHub<ReservationHub>("/reservationHub");
-//app.UseHangfireDashboard();
+app.UseHangfireDashboard();
 app.Run();
