@@ -15,7 +15,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OfficeOpenXml;
+using Persistence.Travel.Repositories;
 using System.Text;
+using TravelCoAPI.Models;
+using static OfficeOpenXml.ExcelErrorValue;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TravelCoAPI.Controllers
@@ -138,8 +143,8 @@ namespace TravelCoAPI.Controllers
                                 HomeLongitude = longitude
                             };
                             var recommendationResult = await _mediator.Send(recommendationCommand);
-                            
-                           
+
+                            await _uow.SaveChangeAsync();
                           
                         }
                         return Ok(values.Message);
@@ -206,5 +211,170 @@ namespace TravelCoAPI.Controllers
         //    }
         //}
 
+
+
+        [HttpPost("ReceiveScores")]
+        public async Task<IActionResult> Post(ReservationScoreModel model)
+        {
+            if (model == null || model.Top_15_Scores == null || model.Top_15_Scores.Count == 0)
+            {
+                return BadRequest("Geçersiz istek verisi.");
+            }
+
+            int rezno = model.Rezno;
+            int userId = model.UserId;
+
+            var filePath = @"C:\Users\ysmgu\OneDrive\Masaüstü\AirouteData4.xlsx";
+            var fileInfo = new FileInfo(filePath);
+            using (ExcelPackage package = new ExcelPackage(fileInfo))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Airoute Data");
+
+                worksheet.Cells[1, 1].Value = "RezNo";
+                worksheet.Cells[1, 2].Value = "Source_PlaceLat";
+                worksheet.Cells[1, 3].Value = "Source_PlaceLong";
+                worksheet.Cells[1, 4].Value = "Target_PlaceLat";
+                worksheet.Cells[1, 5].Value = "Target_PlaceLong";
+                worksheet.Cells[1, 6].Value = "Route_Id";
+                worksheet.Cells[1, 7].Value = "Distance";
+                worksheet.Cells[1, 8].Value = "CO2";
+                worksheet.Cells[1, 9].Value = "Time";
+                worksheet.Cells[1, 10].Value = "VehicleName";
+                worksheet.Cells[1, 11].Value = "TravelMode";
+                worksheet.Cells[1, 12].Value = "Puan";
+
+                int row = 2;
+
+                using (HttpClient client = new HttpClient())
+                {
+                    foreach (var score in model.Top_15_Scores)
+                    {
+                        var homeLatitude = model.HomeLatitude;
+                        var homeLongitude = model.HomeLongitude;
+                       
+                            float destinationLatitude = score.Latitude;
+                            float destinationLongitude = score.Longitude;
+
+                            var routeapi = "http://localhost:19175/api/Directions";
+
+                            var parameters = new
+                            {
+                                sourceLat = (double)homeLatitude,
+                                sourceLng = (double)homeLongitude,
+                                destLat = (double)destinationLatitude,
+                                destLng = (double)destinationLongitude,
+                            };
+
+                            var jsonRequest = JsonConvert.SerializeObject(parameters);
+                            var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+
+                            var response = await client.PostAsync(routeapi, content);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseBody = await response.Content.ReadAsStringAsync();
+                                var routes = JsonConvert.DeserializeObject<JObject>(responseBody);
+
+                                foreach (var mode in routes)
+                                {
+                                    var modeName = mode.Key;
+                                    var modeRoutes = mode.Value["routes"].Take(3);
+                                    foreach (var route in modeRoutes)
+                                    {
+                                        var legs = route["legs"];
+                                        foreach (var leg in legs)
+                                        {
+                                            var transitDetails = leg["transit_details"];
+                                            var steps = leg["steps"];
+
+                                            var stepDictionary = new Dictionary<string, Tuple<string, string>>();
+
+                                            foreach (var step in steps)
+                                            {
+                                                var stepDuration = step["duration"]["text"].ToString();
+                                                var stepDistance = step["distance"]["text"].ToString();
+                                                var stepMode = step["travel_mode"].ToString();
+
+                                                if (modeName == "transit")
+                                                {
+
+                                                    var vehicleName = step["transit_details"]?["line"]?["vehicle"]?["name"]?.ToString() ?? "";
+
+                                                    if (stepMode == "WALKING")
+                                                    {
+                                                        vehicleName = "Walking";
+                                                    }
+                                                    if (stepMode == "BICYCLING")
+                                                    {
+                                                        vehicleName = "Bicycling";
+                                                    }
+                                                    if (stepMode == "DRIVING")
+                                                    {
+                                                        vehicleName = "Driving";
+                                                    }
+                                                    if (stepDictionary.ContainsKey(vehicleName))
+                                                    {
+                                                        int count = 1;
+                                                        while (stepDictionary.ContainsKey($"{vehicleName} {count}"))
+                                                        {
+                                                            count++;
+                                                        }
+                                                        vehicleName = $"{vehicleName} {count}";
+                                                    }
+
+                                                    stepDictionary.Add(vehicleName, new Tuple<string, string>(stepDuration, stepDistance));
+
+                                                }
+                                            }
+
+                                            var airoutemodel = new AIRoute
+                                            {
+                                                UserId = userId,
+                                                ReservationId = rezno,
+                                                Source_Place_Latitude = homeLatitude,
+                                                Source_Place_Longutude = homeLongitude,
+                                                Target_Place_Latitude = destinationLatitude,
+                                                Target_Place_Longutude = destinationLongitude,
+                                                CO2 = 0,
+                                                Distance = route["legs"][0]["distance"]["text"].ToString(),
+                                                Duration = route["legs"][0]["duration"]["text"].ToString(),
+                                                VehicleName = modeName == "transit" ? JsonConvert.SerializeObject(stepDictionary) : "Unknown",
+                                                TravelMode = modeName,
+                                                RouteNo = route["overview_polyline"]["points"].ToString()
+                                            };
+
+                                            worksheet.Cells[row, 1].Value = airoutemodel.ReservationId;
+                                            worksheet.Cells[row, 2].Value = airoutemodel.Source_Place_Latitude;
+                                            worksheet.Cells[row, 3].Value = airoutemodel.Source_Place_Longutude;
+                                            worksheet.Cells[row, 4].Value = airoutemodel.Target_Place_Latitude;
+                                            worksheet.Cells[row, 5].Value = airoutemodel.Target_Place_Longutude;
+                                            worksheet.Cells[row, 6].Value = airoutemodel.RouteNo; 
+                                            worksheet.Cells[row, 7].Value = airoutemodel.Distance;
+                                            worksheet.Cells[row, 8].Value = airoutemodel.CO2;
+                                            worksheet.Cells[row, 9].Value = airoutemodel.Duration;
+                                            worksheet.Cells[row, 10].Value = airoutemodel.VehicleName;
+                                            worksheet.Cells[row, 11].Value = airoutemodel.TravelMode;
+                                            worksheet.Cells[row, 12].Value = 0; // Puan yerine 0 yazılıyor
+                                            row++;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                return BadRequest();
+                            }
+                        }
+                    }
+                
+
+                package.Save();
+            }
+
+            return Ok("Veriler Excel dosyasına kaydedildi.");
+        }
+
+
+
     }
 }
+
