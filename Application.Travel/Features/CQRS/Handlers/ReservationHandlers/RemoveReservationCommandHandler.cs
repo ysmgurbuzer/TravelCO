@@ -62,7 +62,7 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
                 }
 
                 reservation.Status = ReservationStatus.Cancelled.ToString();
-
+                _repository.Update(reservation, reservation);
                 //house.Reservations.Remove(reservation);
                 // _repository.Delete(reservation);
                 //PARA İADESİ İŞLEMİ YAPILACAK
