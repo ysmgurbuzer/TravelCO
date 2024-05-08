@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Handlers.HousingHandlers;
 using Application.Travel.Interfaces;
 using Application.Travel.Services;
+using Braintree;
 using Domain.Travel.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,23 @@ namespace Application.Travel
             services.AddSingleton<RedisService>();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof
                 (DependencyExtension).Assembly));
-          
-            
+
+            services.AddSingleton<IBraintreeGateway>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var environment = configuration["Braintree:Environment"];
+                var merchantId = configuration["Braintree:MerchantId"];
+                var publicKey = configuration["Braintree:PublicKey"];
+                var privateKey = configuration["Braintree:PrivateKey"];
+
+                return new BraintreeGateway
+                {
+                    Environment = environment.Equals("Production") ? Braintree.Environment.PRODUCTION : Braintree.Environment.SANDBOX,
+                    MerchantId = merchantId,
+                    PublicKey = publicKey,
+                    PrivateKey = privateKey
+                };
+            });
 
         }
 

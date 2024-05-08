@@ -397,21 +397,57 @@ namespace TravelCoAPI.Controllers
            
 
             package.Save();
-            ////try
-            ////{
-            ////    var jobId1 = BackgroundJob.Schedule(() => Runpythonscript1(), TimeSpan.FromMilliseconds(1));
+            string apiUrl = "http://127.0.0.1:5001/calculate_footprints";
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                   
+                    HttpResponseMessage response = await client.PostAsync(apiUrl, null);
 
-               
-            ////    BackgroundJob.ContinueJobWith(jobId1, () => RunPythonScript2());
-            ////}
-            ////catch (Exception ex)
-            ////{
+                    
+                    if (response.IsSuccessStatusCode)
+                    {
+                        
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine("API yanıtı: " + responseBody);
+                    }
+                    else
+                    {
+                        Console.WriteLine("API isteği başarısız oldu. Durum kodu: " + response.StatusCode);
+                    }
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine("HTTP isteği sırasında bir hata oluştu: " + e.Message);
+                }
+            }
 
-            ////    Console.WriteLine("hata oluştu: " + ex.Message);
-            ////}
+            string apiUrl1 = "http://127.0.0.1:5002/update_scores";
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+
+                    HttpResponseMessage response = await client.PostAsync(apiUrl1, null);
 
 
+                    if (response.IsSuccessStatusCode)
+                    {
 
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine("API yanıtı: " + responseBody);
+                    }
+                    else
+                    {
+                        Console.WriteLine("API isteği başarısız oldu. Durum kodu: " + response.StatusCode);
+                    }
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine("HTTP isteği sırasında bir hata oluştu: " + e.Message);
+                }
+            }
 
             return Ok("Veriler Excel dosyasına kaydedildi.");
         }
