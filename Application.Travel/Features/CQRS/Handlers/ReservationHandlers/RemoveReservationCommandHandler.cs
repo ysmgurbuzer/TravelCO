@@ -61,10 +61,10 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
                     return Response<Reservation>.Fail("Cannot cancel reservation. Minimum cancellation period is 7 days.");
                 }
 
-                reservation.Status=ReservationStatus.Confirmed.ToString();
-                Console.WriteLine(reservation.Status);
-                house.Reservations.Remove(reservation);
-                 _repository.Delete(reservation);
+                reservation.Status = ReservationStatus.Cancelled.ToString();
+
+                //house.Reservations.Remove(reservation);
+                // _repository.Delete(reservation);
                 //PARA İADESİ İŞLEMİ YAPILACAK
                 await _uow.SaveChangeAsync();
 

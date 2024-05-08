@@ -17,6 +17,9 @@ using Infrastructure.Travel.Tools;
 using Hangfire;
 using OfficeOpenXml;
 using Microsoft.Extensions.Configuration;
+using TravelCoAPI.Controllers;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +40,6 @@ builder.Services.AddHangfire(config => config
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
     .UseSqlServerStorage(hangfireConnectionString));
-
 
 
 builder.Services.AddHangfireServer();

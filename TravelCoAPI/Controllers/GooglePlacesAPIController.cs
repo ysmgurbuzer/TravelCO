@@ -18,12 +18,12 @@ namespace TravelCoAPI.Controllers
     {
 
         private readonly IMediator _mediator;
-        private readonly string _apiKey = "AIzaSyAP8xFXLmlUSx7OgN0t8_XSCBHUZE4t4AY";
+        private readonly string _api = "AIzaSyC4QvdTDRc-m_mSHcqxcvPh0BncxdLeXOU";
         private readonly ILogger<GooglePlacesAPIController> _logger;
 
-        public GooglePlacesAPIController(string apiKey, IMediator mediator, ILogger<GooglePlacesAPIController> logger)
+        public GooglePlacesAPIController(string apinew, IMediator mediator, ILogger<GooglePlacesAPIController> logger)
         {
-            _apiKey = apiKey;
+            _api = apinew;
             _mediator = mediator;
             _logger = logger;
         }
@@ -105,7 +105,7 @@ namespace TravelCoAPI.Controllers
                 };
 
                 var jsonRequest = JsonConvert.SerializeObject(data);
-                var apiKeyParam = $"key={_apiKey}";
+                var apiKeyParam = $"key=AIzaSyC4QvdTDRc-m_mSHcqxcvPh0BncxdLeXOU";
 
                 using (var client = new HttpClient())
                 {
