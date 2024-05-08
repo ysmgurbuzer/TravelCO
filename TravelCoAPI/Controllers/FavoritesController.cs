@@ -102,6 +102,7 @@ namespace TravelCoAPI.Controllers
                 if (values.Succeeded)
                 {
                     _logger.LogInformation("Favorites retrieved successfully.");
+
                     return Ok(values);
                 }
                 else

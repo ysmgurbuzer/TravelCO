@@ -19,6 +19,7 @@ namespace Application.Travel.Features.CQRS.Commands.ReservationCommands
         public DateTime CheckOutDate { get; set; }
         public int NumberOfAdults { get; set; }
         public int NumberOfChildren { get; set; }
-     
+       // public decimal TotalPrice { get; set; }
+
     }
 }
