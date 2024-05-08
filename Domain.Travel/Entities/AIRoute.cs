@@ -11,8 +11,8 @@ namespace Domain.Travel.Entities
         public int ReservationId { get; set; }
         public int UserId { get; set; }
 
-        public decimal Source_Place_Latitude { get; set; }
-        public decimal Source_Place_Longutude { get; set; }
+        public float Source_Place_Latitude { get; set; }
+        public float Source_Place_Longutude { get; set; }
         public float Target_Place_Latitude { get; set; }
         public float Target_Place_Longutude { get; set; }
 

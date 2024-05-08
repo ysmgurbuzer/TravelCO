@@ -10,6 +10,7 @@ using Application.Travel.Interfaces;
 using Application.Travel.Models;
 using Application.Travel.Services;
 using Domain.Travel.Entities;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
 using Persistence.Travel.Repositories;
+using System;
+using System.Diagnostics;
 using System.Text;
 using TravelCoAPI.Models;
 using static OfficeOpenXml.ExcelErrorValue;
@@ -25,7 +28,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TravelCoAPI.Controllers
 {
-
+   
     [Route("api/[controller]")]
     [ApiController]
     public class ReservationsController : ControllerBase
@@ -38,7 +41,7 @@ namespace TravelCoAPI.Controllers
         private readonly IRepository<Domain.Travel.Entities.Place> _placerepo;
         private readonly IRepository<PlaceEntity> _plcepo;
         private readonly IUow _uow;
-        public ReservationsController(IMediator mediator, IRepository<Housing> repo, ILogger<ReservationsController> logger, IRepository<Location> locationRepo, IRepository<AIRecommendation> airepo, IRepository<Domain.Travel.Entities.Place> placerepo, IUow uow, IRepository<PlaceEntity> plcepo)
+        public ReservationsController(IMediator mediator, IRepository<Housing> repo, ILogger<ReservationsController> logger, IRepository<Location> locationRepo, IRepository<AIRecommendation> airepo, IRepository<Domain.Travel.Entities.Place> placerepo,IUow uow, IRepository<PlaceEntity> plcepo)
         {
             _mediator = mediator;
             _repo = repo;
@@ -47,7 +50,7 @@ namespace TravelCoAPI.Controllers
             _airepo = airepo;
             _placerepo = placerepo;
             _uow = uow;
-            _plcepo = plcepo;
+            _plcepo = plcepo;   
         }
 
         //getbyıd kullanarak ownerın evine yapılan rezervasyonları görüntüle
@@ -101,11 +104,11 @@ namespace TravelCoAPI.Controllers
             }
         }
 
+      
+     
 
 
 
-
-        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateReservation(CreateReservationCommand command)
         {
@@ -144,8 +147,8 @@ namespace TravelCoAPI.Controllers
                             };
                             var recommendationResult = await _mediator.Send(recommendationCommand);
 
-                           
-
+                            await _uow.SaveChangeAsync();
+                          
                         }
                         return Ok(values.Message);
                     }
@@ -211,6 +214,8 @@ namespace TravelCoAPI.Controllers
         //    }
         //}
 
+
+
         [HttpPost("ReceiveScores")]
         public async Task<IActionResult> Post(ReservationScoreModel model)
         {
@@ -243,7 +248,7 @@ namespace TravelCoAPI.Controllers
                 worksheet.Cells[1, 10].Value = "Time";
                 worksheet.Cells[1, 11].Value = "VehicleName";
                 worksheet.Cells[1, 12].Value = "TravelMode";
-
+               
 
             }
             else
@@ -251,7 +256,7 @@ namespace TravelCoAPI.Controllers
                 package = new ExcelPackage(fileInfo);
             }
 
-            var existingWorksheet = package.Workbook.Worksheets.First();
+            var existingWorksheet = package.Workbook.Worksheets.First(); 
 
             int rowCount = existingWorksheet.Dimension?.Rows ?? 0;
             rowCount++;
@@ -265,7 +270,7 @@ namespace TravelCoAPI.Controllers
 
                 float destinationLatitude = score.Latitude;
                 float destinationLongitude = score.Longitude;
-
+               
 
                 string coordinates = $"{destinationLatitude},{destinationLongitude}";
                 if (!uniqueCoordinates.Contains(coordinates))
@@ -372,7 +377,7 @@ namespace TravelCoAPI.Controllers
                                     existingWorksheet.Cells[rowCount, 10].Value = airoutemodel.Duration;
                                     existingWorksheet.Cells[rowCount, 11].Value = airoutemodel.VehicleName;
                                     existingWorksheet.Cells[rowCount, 12].Value = airoutemodel.TravelMode;
-
+                                    
 
                                     rowCount++;
                                 }
@@ -383,15 +388,27 @@ namespace TravelCoAPI.Controllers
                     {
                         return BadRequest();
                     }
-
+               
                 }
-
+              
 
 
             }
-
+           
 
             package.Save();
+            ////try
+            ////{
+            ////    var jobId1 = BackgroundJob.Schedule(() => Runpythonscript1(), TimeSpan.FromMilliseconds(1));
+
+               
+            ////    BackgroundJob.ContinueJobWith(jobId1, () => RunPythonScript2());
+            ////}
+            ////catch (Exception ex)
+            ////{
+
+            ////    Console.WriteLine("hata oluştu: " + ex.Message);
+            ////}
 
 
 
@@ -399,7 +416,32 @@ namespace TravelCoAPI.Controllers
             return Ok("Veriler Excel dosyasına kaydedildi.");
         }
 
+        //[HttpGet("runpythonscript1")]
+        //public void Runpythonscript1()
+        //{
+        //    try
+        //    {
+        //        Process.Start("python", @"C:\Users\ysmgu\PycharmProjects\pythonProject7");
+        //    }
+        //    catch (Exception ex)
+        //    {
 
+        //        Console.WriteLine("hata oluştu: " + ex.Message);
+        //    }
+        //}
+
+        //[HttpGet("runpythonscript2")]
+        //public void RunPythonScript2()
+        //{
+        //    try
+        //    {
+        //        Process.Start("python", @"C:\Users\ysmgu\PycharmProjects\pythonProject8");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("hata oluştu: " + ex.Message);
+        //    }
+        //}
     }
 }
 
