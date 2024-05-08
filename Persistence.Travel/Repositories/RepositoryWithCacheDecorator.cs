@@ -153,18 +153,20 @@ namespace Persistence.Travel.Repositories
             var entityId = prop.GetValue(entity).ToString();
 
             var existsInCache = await _cacheRepository.HashExistsAsync(_key, entityId);
+         
+                if (existsInCache)
+                {
+                    
+                    await _cacheRepository.HashDeleteAsync(_key, entityId);
+                     _repository.Delete(entity);
 
+                }
+                else
+                {
 
-            if (existsInCache)
-            {
-                await _cacheRepository.HashDeleteAsync(_key, entityId);
-                 _repository.Delete(entity);
-            }
-            else
-            {
-
-                 _repository.Delete(entity);
-            }
+                     _repository.Delete(entity);
+                }
+            
         }
 
         public async Task Update(T t, T unchanged)
