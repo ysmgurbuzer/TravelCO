@@ -227,14 +227,14 @@ namespace TravelCoAPI.Controllers
             int rezno = model.Rezno;
             int userId = model.UserId;
 
-            var filePath = @"C:\Users\ysmgu\OneDrive\Masaüstü\AirouteData4.xlsx";
+            var filePath = @"C:\Users\ysmgu\OneDrive\Masaüstü\Predictions.xlsx";
             FileInfo fileInfo = new FileInfo(filePath);
             ExcelPackage package;
 
             if (!fileInfo.Exists)
             {
                 package = new ExcelPackage(fileInfo);
-                var worksheet = package.Workbook.Worksheets.Add("Airoute Data");
+                var worksheet = package.Workbook.Worksheets.Add("Tabelle1");
 
                 worksheet.Cells[1, 1].Value = "RezNo";
                 worksheet.Cells[1, 2].Value = "UserId";
@@ -244,10 +244,9 @@ namespace TravelCoAPI.Controllers
                 worksheet.Cells[1, 6].Value = "Target_PlaceLong";
                 worksheet.Cells[1, 7].Value = "Route_Id";
                 worksheet.Cells[1, 8].Value = "Distance";
-                worksheet.Cells[1, 9].Value = "CO2";
-                worksheet.Cells[1, 10].Value = "Time";
-                worksheet.Cells[1, 11].Value = "VehicleName";
-                worksheet.Cells[1, 12].Value = "TravelMode";
+                worksheet.Cells[1, 9].Value = "Time";
+                worksheet.Cells[1, 10].Value = "VehicleName";
+                worksheet.Cells[1, 11].Value = "TravelMode";
                
 
             }
@@ -373,10 +372,10 @@ namespace TravelCoAPI.Controllers
                                     existingWorksheet.Cells[rowCount, 6].Value = airoutemodel.Target_Place_Longutude;
                                     existingWorksheet.Cells[rowCount, 7].Value = airoutemodel.RouteNo;
                                     existingWorksheet.Cells[rowCount, 8].Value = airoutemodel.Distance;
-                                    existingWorksheet.Cells[rowCount, 9].Value = airoutemodel.CO2;
-                                    existingWorksheet.Cells[rowCount, 10].Value = airoutemodel.Duration;
-                                    existingWorksheet.Cells[rowCount, 11].Value = airoutemodel.VehicleName;
-                                    existingWorksheet.Cells[rowCount, 12].Value = airoutemodel.TravelMode;
+                                  
+                                    existingWorksheet.Cells[rowCount, 9].Value = airoutemodel.Duration;
+                                    existingWorksheet.Cells[rowCount, 10].Value = airoutemodel.VehicleName;
+                                    existingWorksheet.Cells[rowCount, 11].Value = airoutemodel.TravelMode;
                                     
 
                                     rowCount++;
@@ -397,57 +396,7 @@ namespace TravelCoAPI.Controllers
            
 
             package.Save();
-            string apiUrl = "http://127.0.0.1:5001/calculate_footprints";
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-                   
-                    HttpResponseMessage response = await client.PostAsync(apiUrl, null);
-
-                    
-                    if (response.IsSuccessStatusCode)
-                    {
-                        
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine("API yanıtı: " + responseBody);
-                    }
-                    else
-                    {
-                        Console.WriteLine("API isteği başarısız oldu. Durum kodu: " + response.StatusCode);
-                    }
-                }
-                catch (HttpRequestException e)
-                {
-                    Console.WriteLine("HTTP isteği sırasında bir hata oluştu: " + e.Message);
-                }
-            }
-
-            string apiUrl1 = "http://127.0.0.1:5002/update_scores";
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-
-                    HttpResponseMessage response = await client.PostAsync(apiUrl1, null);
-
-
-                    if (response.IsSuccessStatusCode)
-                    {
-
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine("API yanıtı: " + responseBody);
-                    }
-                    else
-                    {
-                        Console.WriteLine("API isteği başarısız oldu. Durum kodu: " + response.StatusCode);
-                    }
-                }
-                catch (HttpRequestException e)
-                {
-                    Console.WriteLine("HTTP isteği sırasında bir hata oluştu: " + e.Message);
-                }
-            }
+          
 
             return Ok("Veriler Excel dosyasına kaydedildi.");
         }
