@@ -62,7 +62,21 @@ namespace Application.Travel.Features.CQRS.Handlers.ReservationHandlers
                 }
 
                 reservation.Status = ReservationStatus.Cancelled.ToString();
-                _repository.Update(reservation, reservation);
+                var newRezervation = new Reservation
+                {
+                    Status= ReservationStatus.Cancelled.ToString(),
+                    NumberOfAdults= reservation.NumberOfAdults,
+                    CheckInDate = reservation.CheckInDate,
+                    CheckOutDate = reservation.CheckOutDate,
+                    HousingId=reservation.HousingId,
+                    NumberOfChildren= reservation.NumberOfChildren,
+                    UserId=reservation.UserId,
+                    TotalPrice= reservation.TotalPrice, 
+                    Id=reservation.Id,
+
+                };
+
+                _repository.Update(newRezervation, reservation);
                 //house.Reservations.Remove(reservation);
                 // _repository.Delete(reservation);
                 //PARA İADESİ İŞLEMİ YAPILACAK

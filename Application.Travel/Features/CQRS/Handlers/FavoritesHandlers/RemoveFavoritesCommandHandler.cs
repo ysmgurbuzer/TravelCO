@@ -36,11 +36,16 @@ namespace Application.Travel.Features.CQRS.Handlers.FavoritesHandlers
 
                 var userIdClaim = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
            
-                if (request.Id != null)
+                if (request.HousingId != null)
                 {
-                    var value = await _repository.GetByIdAsync(request.Id);
+                    
+                    var value =  _repository.GetByFilter(item=>item.HousingId==request.HousingId && item.UserId.ToString()==userIdClaim);
                     if (value.UserId.ToString() != userIdClaim) 
                     { 
+                        return Response<Favorites>.Fail($"Record not found");
+                    }
+                    if (value == null)
+                    {
                         return Response<Favorites>.Fail($"Record not found");
                     }
                      _repository.Delete(value);

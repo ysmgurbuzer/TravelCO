@@ -40,10 +40,17 @@ namespace Application.Travel.Features.CQRS.Handlers.FavoritesHandlers
                     UserId =userIdClaim,
                    HousingId = HousingId,
                 };
-
-                await _repository.AddAsync(values);
-                await _uow.SaveChangeAsync();
-                return Response<Favorites>.Success(values);
+                var isExist = _repository.GetList(item => item.HousingId == command.HousingId && item.UserId==userIdClaim);
+                if (isExist.Count==0)
+                {
+                    await _repository.AddAsync(values);
+                    await _uow.SaveChangeAsync();
+                    return Response<Favorites>.Success(values);
+                }
+                else
+                {
+                    return Response<Favorites>.Fail("This housing is already exist in favotite list");
+                }
             }
             catch (ValidateException ex)
             {

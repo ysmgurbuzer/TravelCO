@@ -156,7 +156,6 @@ namespace Persistence.Travel.Repositories
          
                 if (existsInCache)
                 {
-                    
                     await _cacheRepository.HashDeleteAsync(_key, entityId);
                      _repository.Delete(entity);
 
@@ -171,12 +170,20 @@ namespace Persistence.Travel.Repositories
 
         public async Task Update(T t, T unchanged)
         {
-             _repository.Update(t, unchanged);
 
             var serializeObject = JsonSerializer.Serialize(t);
             PropertyInfo prop = typeof(T).GetProperty("Id");
             var entityId = prop.GetValue(t).ToString();
-            await _cacheRepository.HashSetAsync(_key, entityId, serializeObject);
+            if (entityId != null)
+            {
+                await _cacheRepository.HashSetAsync(_key, entityId, serializeObject);
+                _repository.Update(t, unchanged);
+            }
+            else
+            {
+                _repository.Update(t, unchanged);
+            }
+            
         }
 
 

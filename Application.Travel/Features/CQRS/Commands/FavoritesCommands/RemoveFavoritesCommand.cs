@@ -11,10 +11,10 @@ namespace Application.Travel.Features.CQRS.Commands.FavoritesCommands
 {
     public class RemoveFavoritesCommand : IRequest<Response<Favorites>>
     {
-        public int Id { get; set; }
-        public RemoveFavoritesCommand(int id)
+        public int HousingId { get; set; }
+        public RemoveFavoritesCommand(int housingId)
         {
-            Id = id;
+            HousingId = housingId;
         }
     }
 }
