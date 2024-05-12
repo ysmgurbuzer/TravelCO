@@ -1,6 +1,19 @@
-﻿namespace TravelCoAPI.Models
+﻿using Domain.Travel.Entities;
+using Infrastructure.Travel.CustomErrorHandler;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Travel.Features.CQRS.Commands.RouteCommands
 {
-    public class FinalRouteModel
+    public class CreateRouteCommand : IRequest<Response<Routes>>
+    {
+        public List<RouteList> RoutesList { get; set; }
+    }
+    public class RouteList 
     {
         public double Source_Lat { get; set; }
         public double Source_Long { get; set; }

@@ -29,7 +29,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         private readonly IMediator _mediator;
         private readonly AIRecommendationServiceBuilder _ai;
         private readonly IUow _uow;
-        private string apiUrl = "http://127.0.0.1:5000/reservation";
+        private string apiUrl = "http://127.0.0.1:5001/reservation";
         public CreateRecommendationCommandHandler(IRepository<AIRecommendation> repository,
             IMapper mapper, 
             IHttpContextAccessor contextAccessor,
@@ -103,6 +103,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
                 await _repository.AddAsync(values);
 
 
+                
                 using (var client = new HttpClient())
                 {
                    
