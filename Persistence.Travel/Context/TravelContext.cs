@@ -47,7 +47,7 @@ namespace Persistence.Travel.Context
         public DbSet<User> Users { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
         public DbSet<PlaceEntity> PlaceEntity { get; set; }
-
+        public DbSet<Routes> Routes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

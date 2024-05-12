@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence.Travel.Context;
 
@@ -11,9 +12,11 @@ using Persistence.Travel.Context;
 namespace Persistence.Travel.Migrations
 {
     [DbContext(typeof(TravelContext))]
-    partial class TravelContextModelSnapshot : ModelSnapshot
+    [Migration("20240511214215_route")]
+    partial class route
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -465,61 +468,6 @@ namespace Persistence.Travel.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-                });
-
-            modelBuilder.Entity("Domain.Travel.Entities.Routes", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("Distance")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("HousingId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Puan")
-                        .HasColumnType("float");
-
-                    b.Property<int>("RezNo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Route_ID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Source_Lat")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Source_Long")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Target_Lat")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Target_Long")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Time")
-                        .HasColumnType("float");
-
-                    b.Property<string>("TravelMode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("User_ID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VehicleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Routes");
                 });
 
             modelBuilder.Entity("Domain.Travel.Entities.Survey", b =>

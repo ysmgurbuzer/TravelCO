@@ -1,7 +1,14 @@
-﻿namespace TravelCoAPI.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Domain.Travel.Entities
 {
-    public class FinalRouteModel
+    public class Routes
     {
+        public int Id { get; set; }
         public double Source_Lat { get; set; }
         public double Source_Long { get; set; }
         public double Target_Lat { get; set; }
@@ -15,6 +22,5 @@
         public int RezNo { get; set; }
         public string Route_ID { get; set; }
         public int? HousingId { get; set; }
-
     }
 }

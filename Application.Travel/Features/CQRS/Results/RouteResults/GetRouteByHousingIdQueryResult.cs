@@ -1,6 +1,12 @@
-﻿namespace TravelCoAPI.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Travel.Features.CQRS.Results.RouteResults
 {
-    public class FinalRouteModel
+    public class GetRouteByHousingIdQueryResult
     {
         public double Source_Lat { get; set; }
         public double Source_Long { get; set; }
@@ -15,6 +21,5 @@
         public int RezNo { get; set; }
         public string Route_ID { get; set; }
         public int? HousingId { get; set; }
-
     }
 }
