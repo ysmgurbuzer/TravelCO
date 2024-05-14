@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Commands.ReservationCommands;
 using Application.Travel.Features.CQRS.Commands.RouteCommands;
 using Application.Travel.Interfaces;
+using Application.Travel.Models;
 using Application.Travel.Services;
 using AutoMapper.Configuration.Annotations;
 using Domain.Travel.Entities;
@@ -27,11 +28,7 @@ namespace Application.Travel.Features.CQRS.Handlers.RoutesHandlers
             _housingRepository = housingRepository;
             _uow = uow;
         }
-        public static double CustomRound(double value, int digits)
-        {
-            double factor = Math.Pow(10, digits);
-            return Math.Truncate(value * factor) / factor;
-        }
+
 
         public async Task<Response<Routes>> Handle(CreateRouteCommand request, CancellationToken cancellationToken)
         {
@@ -39,18 +36,11 @@ namespace Application.Travel.Features.CQRS.Handlers.RoutesHandlers
             {
                 return Response<Routes>.Fail("Rota verileri boş");
             }
-            var homeLat = CustomRound(request.RoutesList[0].Source_Lat, 3); 
-            var homeLong = CustomRound(request.RoutesList[0].Source_Long, 3);
-
-            var locationEntity = _locationsRepository.GetByFilter(item =>
-                Math.Round(item.latitude, 3) == homeLat && Math.Round(item.longitude, 3) == homeLong);
-            var locationId = locationEntity.Id;
-
-            var housing = _housingRepository.GetByFilter(item => item.LocationId == locationId);
+          
 
             foreach (var command in request.RoutesList)
             {
-                command.HousingId = housing.Id;
+                command.HousingId = ReservationWithHosing.HousingId;
 
                 var route = new Routes
                 {
