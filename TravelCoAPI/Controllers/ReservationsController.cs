@@ -123,6 +123,8 @@ namespace TravelCoAPI.Controllers
                     var latitude = location.latitude;
                     var longitude = location.longitude;
 
+                    ReservationWithHosing.HousingId = ıd;
+
                     var nearbyPlacesUrl = "http://localhost:19175/api/GooglePlacesAPI";
 
                     using (HttpClient client = new HttpClient())
@@ -247,7 +249,16 @@ namespace TravelCoAPI.Controllers
                 worksheet.Cells[1, 9].Value = "Time";
                 worksheet.Cells[1, 10].Value = "VehicleName";
                 worksheet.Cells[1, 11].Value = "TravelMode";
-               
+                worksheet.Cells[1, 12].Value = "Puan";
+                worksheet.Cells[1, 13].Value = "WALKINGTIME";
+                worksheet.Cells[1, 14].Value = "WALKINGKM";
+                worksheet.Cells[1, 15].Value = "BUSTIME";
+                worksheet.Cells[1, 16].Value = "BUSKM";
+                worksheet.Cells[1, 17].Value = "TRAMTIME";
+                worksheet.Cells[1, 18].Value = "TRAMKM";
+                worksheet.Cells[1, 19].Value = "TRAINTIME";
+                worksheet.Cells[1, 20].Value = "TRAINKM";
+
 
             }
             else
@@ -376,7 +387,7 @@ namespace TravelCoAPI.Controllers
                                     existingWorksheet.Cells[rowCount, 9].Value = airoutemodel.Duration;
                                     existingWorksheet.Cells[rowCount, 10].Value = airoutemodel.VehicleName;
                                     existingWorksheet.Cells[rowCount, 11].Value = airoutemodel.TravelMode;
-                                    
+
 
                                     rowCount++;
                                 }
