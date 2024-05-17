@@ -10,16 +10,23 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Travel.Tools
-{
+namespace Application.Travel.Tools 
+{ 
+
     public class JwtTokenGenerator
     {
+
         private readonly IConfiguration _config;
         public JwtTokenGenerator(IConfiguration config)
         {
             _config = config;
         }
-        public  TokenResponseDto GenerateToken(GetCheckUserResult result)
+        public JwtTokenGenerator()
+        {
+            // Parametresiz kurucu gövdesi
+        }
+
+        public TokenResponseDto GenerateToken(GetCheckUserResult result)
         {
             var claims=new List<Claim>();
             if (result.RoleId != null)

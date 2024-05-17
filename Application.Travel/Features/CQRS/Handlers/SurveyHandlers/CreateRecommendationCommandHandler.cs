@@ -79,6 +79,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
 
                 var values = new AIRecommendation
                 {   
+                    Id=request.RezNo,
                     UserId = userIdClaim,
                     PreferredCategories = surveyResults.PreferredCategories,
                     HomeLatitude = homeLatitude,
@@ -102,7 +103,6 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
 
                 await _repository.AddAsync(values);
                 await _uow.SaveChangeAsync();
-
                 
                 using (var client = new HttpClient())
                 {

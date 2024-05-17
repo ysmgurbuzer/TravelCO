@@ -144,6 +144,7 @@ namespace TravelCoAPI.Controllers
                             var locationResult = await _mediator.Send(new GetReservationWithLocationQuery());
                             var recommendationCommand = new CreateRecommendationCommand
                             {
+                                RezNo=values.Data.Id,
                                 HomeLatitude = latitude,
                                 HomeLongitude = longitude
                             };

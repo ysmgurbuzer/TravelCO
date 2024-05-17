@@ -12,7 +12,6 @@ namespace Domain.Travel.Entities
     {
         [Key]
         public int Id { get; set; }
-
         public int UserId { get; set; }
         public List<string> PreferredCategories { get; set; }
         public double HomeLatitude { get; set; }

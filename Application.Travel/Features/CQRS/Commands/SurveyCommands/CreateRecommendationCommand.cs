@@ -12,7 +12,7 @@ namespace Application.Travel.Features.CQRS.Commands.SurveyCommands
     public class CreateRecommendationCommand : IRequest<Response<AIRecommendation>>
     {
         public int Id { get; set; }
-
+        public int RezNo { get; set; }
         public int UserId { get; set; }
         public List<string> PreferredCategories { get; set; }
         public double HomeLatitude { get; set; }

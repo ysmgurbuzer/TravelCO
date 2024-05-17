@@ -2,6 +2,9 @@
 using Application.Travel.Features.CQRS.Commands.OwnerCommands;
 using Application.Travel.Features.CQRS.Queries.HousingDescriptionQueries;
 using Application.Travel.Features.CQRS.Queries.OwnerQueries;
+using Application.Travel.Features.CQRS.Results.HousingDescriptionResults;
+using Domain.Travel.Entities;
+using Infrastructure.Travel.CustomErrorHandler;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +26,7 @@ namespace TravelCoAPI.Controllers
             _logger = logger;
         }
 
+        //returnler değişti unit test için.
         [HttpGet]
         public async Task<IActionResult> ListDescriptions()
         {
@@ -46,6 +50,7 @@ namespace TravelCoAPI.Controllers
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDescription(int id)

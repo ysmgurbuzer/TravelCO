@@ -12,5 +12,6 @@ namespace Application.Travel.Features.CQRS.Queries.ReservationQueries
 {
     public class GetReservationQuery : IRequest<Response<List<GetReservationQueryResult>>>
     {
+      
     }
 }
