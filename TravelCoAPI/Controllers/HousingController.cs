@@ -68,6 +68,10 @@ namespace TravelCoAPI.Controllers
 
                  
                     var airQualityResponse = await _mediator.Send(airQualityQuery);
+                    if (airQualityResponse.Data == null)
+                    {
+                        return Ok(response.Message);
+                    }
                     response.Data.AirQuality = airQualityResponse.Data.Data.Aqi;
                     response.Data.AirDescription = airQualityResponse.Data.Message;
                     return Ok(response.Data);

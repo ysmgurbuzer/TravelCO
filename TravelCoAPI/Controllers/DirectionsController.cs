@@ -24,9 +24,10 @@ namespace TravelCoAPI.Controllers
     public async Task<IActionResult> GetDirections(GetDirectionModel model)
     {
         try
-        {
+            {
            
-            string apiKey = "AIzaSyAx_FrSGOLPiecG-G-SJ6nFkew7jW40L1o";
+
+                string apiKey = "AIzaSyAx_FrSGOLPiecG-G-SJ6nFkew7jW40L1o";
 
             HttpClient client = _httpClientFactory.CreateClient();
 

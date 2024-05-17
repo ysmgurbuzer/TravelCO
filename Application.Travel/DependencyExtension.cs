@@ -1,6 +1,7 @@
 ﻿using Application.Travel.Features.CQRS.Handlers.HousingHandlers;
 using Application.Travel.Interfaces;
 using Application.Travel.Services;
+using Application.Travel.Tools;
 using Braintree;
 using Domain.Travel.Entities;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ namespace Application.Travel
             services.AddSingleton<RedisService>();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof
                 (DependencyExtension).Assembly));
+            
 
             services.AddSingleton<IBraintreeGateway>(provider =>
             {

@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace Application.Travel.Features.CQRS.Queries.SurveyQueries
 {
-    public class GetSurveyQuery : IRequest<Response<List<GetSurveyQueryResult>>>
+    public class GetSurveyQuery : IRequest<Response<GetSurveyQueryResult>>
     {
+       
     }
 }

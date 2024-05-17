@@ -5,6 +5,7 @@ using Application.Travel.Features.CQRS.Results.HousingDescriptionResults;
 using Application.Travel.Features.CQRS.Results.HousingFeatureResults;
 using Application.Travel.Features.CQRS.Results.HousingResults;
 using Application.Travel.Features.CQRS.Results.RouteResults;
+using Application.Travel.Features.CQRS.Results.SurveyResults;
 using Application.Travel.Features.CQRS.Results.UserResults;
 using AutoMapper;
 using Domain.Travel.Entities;
@@ -45,6 +46,8 @@ namespace Application.Travel.Profiles
             
             CreateMap<Housing, GetHousingByCategoryQueryResult>().ReverseMap();
             CreateMap<Routes, GetRouteByHousingIdQueryResult>().ReverseMap();
+            CreateMap<Survey, GetSurveyQueryResult>().ReverseMap();
+           
         }
     }
 }
