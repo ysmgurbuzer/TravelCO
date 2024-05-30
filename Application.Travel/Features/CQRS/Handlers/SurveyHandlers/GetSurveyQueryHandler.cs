@@ -35,7 +35,7 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         public async Task<Response<GetSurveyQueryResult>> Handle(GetSurveyQuery request, CancellationToken cancellationToken)
         {
             var userIdClaim = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var value = await _surveyRepository.GetByIdAsync(userIdClaim);
+            var value =  _surveyRepository.GetByFilter(x=>x.UserId==userIdClaim);
 
             if (userIdClaim==null)
             {
