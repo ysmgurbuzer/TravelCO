@@ -27,7 +27,7 @@ namespace TravelCoAPI.Controllers
             {
            
 
-                string apiKey = "AIzaSyAx_FrSGOLPiecG-G-SJ6nFkew7jW40L1o";
+                string apiKey = "API_KEY";
 
             HttpClient client = _httpClientFactory.CreateClient();
 
