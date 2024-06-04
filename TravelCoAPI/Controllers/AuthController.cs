@@ -1,6 +1,5 @@
 ﻿using Application.Travel.Features.CQRS.Commands.SurveyCommands;
 using Application.Travel.Features.CQRS.Commands.UserCommands;
-using Application.Travel.Features.CQRS.Queries.SurveyQueries;
 using Application.Travel.Features.CQRS.Queries.UserQueries;
 using Application.Travel.Services;
 using Application.Travel.Tools;
@@ -42,7 +41,7 @@ namespace TravelCoAPI.Controllers
                         _logger.LogInformation("User logged in successfully.");
                         var tokenResponse = _jwtTokenGenerator.GenerateToken(values.Data);
                     
-                        return Ok(new { token = tokenResponse.Token });
+                        return Ok(new { tokenResponse.Token});
                     }
                     else
                     {
@@ -111,32 +110,6 @@ namespace TravelCoAPI.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred during survey creation.");
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
-
-
-        [HttpGet("ListSurvey")]
-        public async Task<IActionResult> GetSurveyByUserId()
-        {
-            try
-            {
-                var response = await _mediator.Send(new GetSurveyQuery());
-
-                if (response.Succeeded)
-                {
-                   
-                    return Ok(response.Data);
-                }
-                else
-                {
-                    
-                    return BadRequest(response.Message);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred during survey list.");
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }

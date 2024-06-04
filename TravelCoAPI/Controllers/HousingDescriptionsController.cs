@@ -36,7 +36,7 @@ namespace TravelCoAPI.Controllers
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Descriptions listed successfully.");
-                    return Ok(response.Data);
+                    return Ok(new Response<List<GetDescriptionQueryResult>> { Data = response.Data, Succeeded = true });
                 }
                 else
                 {
@@ -63,10 +63,11 @@ namespace TravelCoAPI.Controllers
                     _logger.LogInformation("Description retrieved successfully.");
                     return Ok(response.Data);
                 }
+            
                 else
                 {
                     _logger.LogWarning("Failed to retrieve description: {Message}", response.Message);
-                    return BadRequest(response.Message);
+                    return BadRequest(new Response<GetDescriptionQueryResult> { Message = response.Message, Succeeded = false });
                 }
             }
             catch (Exception ex)
@@ -86,12 +87,12 @@ namespace TravelCoAPI.Controllers
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Description updated successfully.");
-                    return Ok(response.Data);
+                    return Ok(new Response<HousingDescriptions> { Data = response.Data, Succeeded = true });
                 }
                 else
                 {
                     _logger.LogWarning("Failed to update description: {Message}", response.Message);
-                    return BadRequest(response.Message);
+                    return BadRequest(new Response<HousingDescriptions> { Message = response.Message, Succeeded = false });
                 }
             }
             catch (Exception ex)
@@ -111,12 +112,12 @@ namespace TravelCoAPI.Controllers
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Description deleted successfully.");
-                    return Ok(response.Message);
+                    return Ok(new Response<HousingDescriptions> { Data = response.Data, Succeeded = true });
                 }
                 else
                 {
                     _logger.LogWarning("Failed to delete description: {Message}", response.Message);
-                    return BadRequest(response.Message);
+                    return BadRequest(new Response<HousingDescriptions> { Message = response.Message, Succeeded = false });
                 }
             }
             catch (Exception ex)
@@ -136,12 +137,13 @@ namespace TravelCoAPI.Controllers
                 if (response.Succeeded)
                 {
                     _logger.LogInformation("Description created successfully.");
-                    return Ok(response.Message);
+                    return Ok(new Response<HousingDescriptions> { Data = response.Data, Succeeded = true });
+
                 }
                 else
                 {
                     _logger.LogWarning("Failed to create description: {Message}", response.Message);
-                    return BadRequest(response.Message);
+                    return BadRequest(new Response<HousingDescriptions> { Message = response.Message, Succeeded = false });
                 }
             }
             catch (Exception ex)

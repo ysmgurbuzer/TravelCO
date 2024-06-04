@@ -39,10 +39,15 @@ namespace Application.Travel.Features.CQRS.Handlers.FavoritesHandlers
                 if (request.Id != null)
                 {
                     var values = await _repository.GetByIdAsync(request.Id);
-                    if(values.UserId.ToString()!= userIdClaim) { return Response<GetFavoritesByIdQueryResult>.Fail("Favorites not found"); }
-                    var result = _mapper.Map<GetFavoritesByIdQueryResult>(values);
+                    if (values != null)
+                    {
+                        if (values.UserId.ToString() != userIdClaim) { return Response<GetFavoritesByIdQueryResult>.Fail("Favorites not found"); }
+                        var result = _mapper.Map<GetFavoritesByIdQueryResult>(values);
 
-                    return Response<GetFavoritesByIdQueryResult>.Success(result);
+                        return Response<GetFavoritesByIdQueryResult>.Success(result);
+                    }
+
+                    return Response<GetFavoritesByIdQueryResult>.Success("Başarılı");
                 }
                 else
                 {
