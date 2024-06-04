@@ -51,9 +51,6 @@ namespace Application.Travel.Features.CQRS.Handlers.SurveyHandlers
         }
 
 
-
-        //RESERVATİON APIDE CREATE EDİLECEK
-
         public async  Task<Response<AIRecommendation>> Handle(CreateRecommendationCommand request, CancellationToken cancellationToken)
         {
             try
