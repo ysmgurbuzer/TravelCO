@@ -18,7 +18,7 @@ namespace TravelCoAPI.Controllers
     {
 
         private readonly IMediator _mediator;
-        private readonly string _api = "AIzaSyC4QvdTDRc-m_mSHcqxcvPh0BncxdLeXOU";
+        private readonly string _api = "API KEY";
         private readonly ILogger<GooglePlacesAPIController> _logger;
 
         public GooglePlacesAPIController(string apinew, IMediator mediator, ILogger<GooglePlacesAPIController> logger)
